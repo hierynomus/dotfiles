@@ -1,0 +1,11 @@
+# General aliases. Ported from the old dotmac zplug/aliases.zsh.
+
+alias gu="git-up"                 # https://github.com/aanand/git-up
+alias gitrm="git ls-files -d | xargs git rm"
+alias gs='git status'
+
+{{ if eq .chezmoi.os "darwin" -}}
+alias ls='ls -G'
+{{ else -}}
+alias ls='ls --color=auto'
+{{ end -}}

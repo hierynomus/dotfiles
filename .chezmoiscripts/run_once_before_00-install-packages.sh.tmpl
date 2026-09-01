@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Runs once (chezmoi hashes this script's content — edit it and it'll run
+# again exactly once) before any dotfiles are applied. Installs the tools
+# the rest of this repo assumes exist. Safe to re-run by hand too:
+# `chezmoi state delete-bucket --bucket=scriptState && chezmoi apply` forces
+# every run_once_ script to fire again.
+set -euo pipefail
+
+echo "==> Bootstrapping packages for {{ .chezmoi.os }}/{{ .chezmoi.arch }}"
+
+{{ if eq .chezmoi.os "darwin" -}}
+if ! command -v brew > /dev/null 2>&1; then
+  echo "==> Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
+
+brew_formulas=(zsh git tmux fzf tree pyenv go)
+brew_casks=(ghostty font-jetbrains-mono-nerd-font)
+
+for f in "${brew_formulas[@]}"; do
+  brew list "$f" > /dev/null 2>&1 || brew install "$f"
+done
+for c in "${brew_casks[@]}"; do
+  brew list --cask "$c" > /dev/null 2>&1 || brew install --cask "$c"
+done
+
+command -v git-up > /dev/null 2>&1 || pip3 install --user --break-system-packages git-up 2>/dev/null || pip3 install --user git-up
+
+{{ else if eq .chezmoi.os "linux" -}}
+if command -v apt-get > /dev/null 2>&1; then
+  sudo apt-get update -y
+  sudo apt-get install -y zsh git tmux fzf tree curl fonts-firacode pipx
+elif command -v dnf > /dev/null 2>&1; then
+  sudo dnf install -y zsh git tmux fzf tree curl pipx
+fi
+
+if command -v pipx > /dev/null 2>&1; then
+  pipx install git-up 2>/dev/null || true
+fi
+
+# Linuxbrew, for parity with macOS package availability (pyenv, go, etc.)
+if ! command -v brew > /dev/null 2>&1 && [ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  echo "==> Installing Linuxbrew"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || true
+fi
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  brew list pyenv > /dev/null 2>&1 || brew install pyenv
+  brew list go > /dev/null 2>&1 || brew install go
+fi
+
+# Nerd Font, for the powerlevel10k prompt icons (GNOME Terminal / Ghostty
+# both just need the font installed and selected in the terminal profile).
+FONT_DIR="$HOME/.local/share/fonts"
+if [ ! -f "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf" ]; then
+  mkdir -p "$FONT_DIR"
+  curl -fsSL -o /tmp/jbm-nerd-font.zip \
+    https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+  unzip -o -q /tmp/jbm-nerd-font.zip -d "$FONT_DIR" "*.ttf"
+  fc-cache -f "$FONT_DIR" > /dev/null 2>&1 || true
+fi
+
+if ! command -v ghostty > /dev/null 2>&1; then
+  echo "NOTE: Ghostty isn't packaged consistently across Linux distros yet."
+  echo "      Install it from https://ghostty.org/download for your distro,"
+  echo "      then re-run 'chezmoi apply' to pick up ~/.config/ghostty/config."
+fi
+{{ end -}}
+
+# Tmux Plugin Manager — ~/.tmux.conf's `run` line expects this to exist.
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
+echo "==> Done. Open a new shell, then inside tmux press prefix+I to fetch plugins."
+echo "==> Run 'p10k configure' the first time you want to tweak the prompt."

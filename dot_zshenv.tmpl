@@ -1,0 +1,22 @@
+#
+# Runs for every zsh invocation (even non-interactive). Keep this small.
+#
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+export EDITOR={{ .editor | quote }}
+export VISUAL={{ .editor | quote }}
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Cargo/Rust
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+{{ else -}}
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+{{ end -}}
+
+# Ensure a non-login, non-interactive shell still gets .zprofile (matches
+# prezto's convention, kept here since the rest of this setup assumes it).
+if [[ ( "$SHLVL" -eq 1 && ! -o LOGIN ) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprofile"
+fi

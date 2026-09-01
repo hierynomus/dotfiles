@@ -1,0 +1,21 @@
+# antidote bundle file — one plugin per line, `antidote bundle` (run from
+# .zshrc) compiles this into a static loader so shells start fast.
+# See: https://getantidote.github.io/
+
+# Useful oh-my-zsh library functions (just the lib, not the whole framework)
+ohmyzsh/ohmyzsh path:lib
+
+# Completion definitions beyond zsh's built-ins
+zsh-users/zsh-completions kind:fpath
+
+# Fish-style "as you type" suggestions from history
+zsh-users/zsh-autosuggestions
+
+# Up/down arrow searches history matching what you've typed so far
+zsh-users/zsh-history-substring-search
+
+# Powerlevel10k prompt
+romkatv/powerlevel10k
+
+# Must load last: highlights commands as valid/invalid while you type
+zsh-users/zsh-syntax-highlighting kind:defer

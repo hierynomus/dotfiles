@@ -1,0 +1,109 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of
+# ~/.zshrc. Anything that reads input (password prompts, [y/n]) must go
+# above this block; everything else goes below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+#
+# antidote — plugin manager. Loads the static bundle if it's up to date,
+# rebuilds it if .zsh_plugins.txt changed since the last shell start.
+#
+ANTIDOTE_HOME="${ZDOTDIR:-$HOME}/.antidote"
+if [[ ! -d "$ANTIDOTE_HOME" ]]; then
+  git clone --depth=1 https://github.com/mattmc3/antidote.git "$ANTIDOTE_HOME"
+fi
+source "$ANTIDOTE_HOME/antidote.zsh"
+
+zsh_plugins="${ZDOTDIR:-$HOME}/.zsh_plugins.zsh"
+zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins.txt"
+if [[ ! "$zsh_plugins" -nt "$zsh_plugins_txt" ]]; then
+  antidote bundle < "$zsh_plugins_txt" > "$zsh_plugins"
+fi
+source "$zsh_plugins"
+
+# To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+#
+# Shell config split out for readability — see dot_config/zsh/ in the
+# chezmoi source, deployed to ~/.config/zsh/.
+#
+for f in "${ZDOTDIR:-$HOME}"/.config/zsh/*.zsh; do
+  source "$f"
+done
+
+#
+# History
+#
+setopt append_history
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_all_dups
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_verify
+setopt inc_append_history
+setopt share_history
+
+export HISTSIZE=100000
+export SAVEHIST=100000
+export HISTFILE="${HOME}/.zsh_history"
+export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
+
+ulimit -S -n 10000 2>/dev/null
+
+#
+# Dev tool integrations — every one of these is conditional on the tool
+# actually being installed, so this file behaves the same whether or not
+# a given machine has it.
+#
+
+if which kubectl > /dev/null 2>&1; then
+  source <(kubectl completion zsh)
+fi
+
+if which scmpuff > /dev/null 2>&1; then
+  eval "$(scmpuff init -s)"
+fi
+
+if which pipenv > /dev/null 2>&1; then
+  eval "$(pipenv --completion)"
+fi
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+{{ if eq .chezmoi.os "darwin" -}}
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+{{ end -}}
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# SDKMAN — this block must stay at the end of the file for sdkman to work.
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# Google Cloud SDK
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Rancher Desktop
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="$HOME/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+{{ else -}}
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+{{ end -}}

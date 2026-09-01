@@ -1,0 +1,11 @@
+{{/* VS Code stores settings in a different absolute path per OS. Both
+     variants are checked into the source dir; this file hides whichever
+     one doesn't apply to the machine chezmoi is running on. */}}
+{{ if ne .chezmoi.os "darwin" -}}
+Library/Application Support/Code/User/settings.json
+Library/Application Support/Code/User/keybindings.json
+{{ end -}}
+{{ if eq .chezmoi.os "darwin" -}}
+.config/Code/User/settings.json
+.config/Code/User/keybindings.json
+{{ end -}}

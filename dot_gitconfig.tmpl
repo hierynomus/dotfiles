@@ -1,0 +1,33 @@
+[user]
+    name = {{ .name }}
+    email = {{ .email }}
+[init]
+    defaultBranch = main
+[pull]
+    rebase = true
+[push]
+    autoSetupRemote = true
+[core]
+    quotepath = false
+    autocrlf = input
+    editor = {{ .editor }}
+    excludesfile = ~/.config/git/ignore
+[color]
+    ui = true
+    status = auto
+    diff = auto
+[alias]
+    st = status -s
+    ci = commit
+    co = checkout
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%Cblue%an, %Cgreen%cr)%Creset' --abbrev-commit --all
+    lg2 = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit
+    ribbon = tag --force _ribbon origin/main
+    catchup = log --patch --reverse --topo-order _ribbon..origin/main
+{{ if eq .chezmoi.os "darwin" -}}
+[credential]
+    helper = osxkeychain
+{{ else -}}
+[credential]
+    helper = cache --timeout=28800
+{{ end -}}

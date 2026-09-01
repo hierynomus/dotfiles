@@ -1,0 +1,11 @@
+{{/* Prompted once per machine on `chezmoi init`. Answers are cached in
+     ~/.config/chezmoi/chezmoi.toml so you won't be asked again on that
+     machine — delete that file (or run `chezmoi init` again) to re-prompt. */}}
+{{ $name := promptStringOnce . "name" "Git name" "Jeroen van Erp" -}}
+{{ $email := promptStringOnce . "email" "Git email" "jeroen@hierynomus.com" -}}
+{{ $editor := promptStringOnce . "editor" "Preferred $EDITOR (command)" "code -n -w" -}}
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
+    editor = {{ $editor | quote }}
