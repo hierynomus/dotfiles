@@ -19,7 +19,9 @@ eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shell
 # mise; per-project Python environments by uv. Neither pyenv/rbenv/nvm nor
 # SDKMAN is installed here anymore.
 brew_formulas=(zsh git tmux fzf tree go mise uv)
-brew_casks=(ghostty font-jetbrains-mono-nerd-font)
+# The Nerd Font for the prompt is installed from the repo's bundled TTFs
+# by run_onchange_after_10-install-fonts.sh, not via a cask.
+brew_casks=(ghostty)
 
 for f in "${brew_formulas[@]}"; do
   brew list "$f" > /dev/null 2>&1 || brew install "$f"
@@ -60,16 +62,9 @@ if [ -x "$MISE" ]; then
   "$MISE" use -g github:mroth/scmpuff
 fi
 
-# Nerd Font, for the powerlevel10k prompt icons (GNOME Terminal / Ghostty
-# both just need the font installed and selected in the terminal profile).
-FONT_DIR="$HOME/.local/share/fonts"
-if [ ! -f "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf" ]; then
-  mkdir -p "$FONT_DIR"
-  curl -fsSL -o /tmp/jbm-nerd-font.zip \
-    https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
-  unzip -o -q /tmp/jbm-nerd-font.zip -d "$FONT_DIR" "*.ttf"
-  fc-cache -f "$FONT_DIR" > /dev/null 2>&1 || true
-fi
+# Nerd Font for the powerlevel10k prompt icons is installed by
+# run_onchange_after_10-install-fonts.sh from the fonts checked into the
+# repo — nothing to download here.
 
 if ! command -v ghostty > /dev/null 2>&1; then
   echo "NOTE: Ghostty isn't packaged consistently across Linux distros yet."

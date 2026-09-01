@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Re-runs whenever the bundled font set below changes (chezmoi hashes this
+# script's rendered content). Installs the Nerd Fonts checked into the
+# repo (chezmoi source `fonts/`) so a fresh machine's powerlevel10k
+# prompt renders correctly without downloading anything.
+#
+# Bundled fonts:
+{{ range (output "ls" "-1" (joinPath .chezmoi.sourceDir "fonts") | trim | splitList "\n") -}}
+#   {{ . }}
+{{ end -}}
+set -euo pipefail
+
+SRC="{{ joinPath .chezmoi.sourceDir "fonts" }}"
+{{ if eq .chezmoi.os "darwin" -}}
+DEST="$HOME/Library/Fonts"
+{{ else -}}
+DEST="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+{{ end -}}
+
+mkdir -p "$DEST"
+cp -f "$SRC"/*.ttf "$DEST"/
+echo "==> Installed $(ls "$SRC"/*.ttf | wc -l | tr -d ' ') font files to $DEST"
+
+{{ if ne .chezmoi.os "darwin" -}}
+if command -v fc-cache > /dev/null 2>&1; then
+  fc-cache -f "$DEST" > /dev/null 2>&1 || true
+fi
+
+echo "==> Set your terminal's font to \"SUSEMono Nerd Font\" if it isn't"
+echo "    picked up automatically (Ghostty already is, via ~/.config/ghostty/config)."
+{{ end -}}

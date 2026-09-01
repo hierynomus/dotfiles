@@ -20,8 +20,8 @@ chezmoi init --apply <your-github-username>/<this-repo-name>
 `$EDITOR`) and cache the answers per-machine in
 `~/.config/chezmoi/chezmoi.toml`. `--apply` runs the package-bootstrap
 script (Homebrew on macOS; zypper/apt/dnf on Linux; then mise + uv,
-antidote, powerlevel10k font, tmux plugin manager) and then symlinks/writes
-everything into place.
+antidote, the bundled Nerd Font, tmux plugin manager) and then
+symlinks/writes everything into place.
 
 After that:
 
@@ -69,7 +69,15 @@ chezmoi apply             # or -v to preview the diff first
   scripts (`yank.sh`, `renew_env.sh`) it calls out to.
 - `dot_config/ghostty/config.tmpl` — Ghostty terminal config. Same file
   works on both OSes since Ghostty reads `~/.config/ghostty/config`
-  everywhere, not just on Linux.
+  everywhere, not just on Linux. Font is `SUSEMono Nerd Font` (bundled,
+  see `fonts/` below) — a plain Nerd Font renders the powerlevel10k
+  prompt icons wrong on the openSUSE boxes.
+- `fonts/` — the patched `SUSEMono Nerd Font` TTFs, checked into the repo
+  so a fresh machine doesn't download anything.
+  `.chezmoiignore` keeps them out of `~/fonts`;
+  `.chezmoiscripts/run_onchange_after_10-install-fonts.sh.tmpl` copies
+  them to `~/.local/share/fonts` (Linux) or `~/Library/Fonts` (macOS) and
+  refreshes the font cache, re-running whenever the file set changes.
 - `dot_config/Code/User/` and `Library/Application Support/Code/User/` —
   the same VS Code settings/keybindings, checked in twice because that's
   where each OS actually looks for them; `.chezmoiignore` hides whichever
@@ -79,11 +87,12 @@ chezmoi apply             # or -v to preview the diff first
   not something worth templating — see the iTerm2/GNOME Terminal note
   below).
 - `.chezmoiscripts/run_once_before_00-install-packages.sh.tmpl` — installs
-  everything above assumes exists (zsh, git, tmux, fzf, tree, a Nerd Font,
-  Ghostty, [mise](https://mise.jdx.dev/), [uv](https://docs.astral.sh/uv/),
-  [scmpuff](https://github.com/mroth/scmpuff), TPM). On Linux it uses
-  zypper (openSUSE), falling back to apt/dnf; `scmpuff` — which has no
-  distro package — is pulled from its GitHub releases via mise's `github`
+  everything above assumes exists (zsh, git, tmux, fzf, tree, Ghostty,
+  [mise](https://mise.jdx.dev/), [uv](https://docs.astral.sh/uv/),
+  [scmpuff](https://github.com/mroth/scmpuff), TPM; the Nerd Font comes
+  from `fonts/` via the font script above). On Linux it uses zypper
+  (openSUSE), falling back to apt/dnf; `scmpuff` — which has no distro
+  package — is pulled from its GitHub releases via mise's `github`
   backend. Runs once per machine; edit the script and it'll run once more
   to pick up the change.
 

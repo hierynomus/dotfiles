@@ -1,3 +1,9 @@
+{{/* Bundled Nerd Font TTFs live in the source dir so a fresh machine
+     doesn't have to download anything. The run_onchange_ font script
+     copies them to the right per-OS location; they must not be applied
+     verbatim to ~/fonts. */}}
+fonts
+
 {{/* VS Code stores settings in a different absolute path per OS. Both
      variants are checked into the source dir; this file hides whichever
      one doesn't apply to the machine chezmoi is running on. */}}
