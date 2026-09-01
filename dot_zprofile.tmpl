@@ -23,8 +23,6 @@ path=(
 {{ if eq .chezmoi.os "darwin" -}}
   /opt/homebrew/{,s}bin(N)
   /usr/local/{,s}bin(N)
-{{ else -}}
-  /home/linuxbrew/.linuxbrew/{,s}bin(N)
 {{ end -}}
   $path
 )
@@ -50,18 +48,16 @@ if [ -x /opt/homebrew/bin/brew ]; then
 elif [ -x /usr/local/bin/brew ]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
-{{ else -}}
-if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
 {{ end -}}
 
 if which go > /dev/null 2>&1; then
   PATH="$PATH:$(go env GOPATH)/bin"
 fi
 
-if which pyenv > /dev/null 2>&1; then
-  eval "$(pyenv init -)"
+# mise shims, so version-managed tools resolve in non-interactive shells too
+# (the interactive `mise activate` hook lives in .zshrc).
+if [[ -d "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims" ]]; then
+  path=("${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims" $path)
 fi
 
 export PATH

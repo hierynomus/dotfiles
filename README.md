@@ -19,8 +19,9 @@ chezmoi init --apply <your-github-username>/<this-repo-name>
 `chezmoi init` will ask three questions the first time (git name, git email,
 `$EDITOR`) and cache the answers per-machine in
 `~/.config/chezmoi/chezmoi.toml`. `--apply` runs the package-bootstrap
-script (Homebrew/apt/dnf as appropriate, antidote, powerlevel10k font, tmux
-plugin manager) and then symlinks/writes everything into place.
+script (Homebrew on macOS; zypper/apt/dnf on Linux; then mise + uv,
+antidote, powerlevel10k font, tmux plugin manager) and then symlinks/writes
+everything into place.
 
 After that:
 
@@ -78,9 +79,12 @@ chezmoi apply             # or -v to preview the diff first
   below).
 - `.chezmoiscripts/run_once_before_00-install-packages.sh.tmpl` — installs
   everything above assumes exists (zsh, git, tmux, fzf, tree, a Nerd Font,
-  Ghostty, [scmpuff](https://github.com/mroth/scmpuff), TPM). Runs once per
-  machine; edit the script and it'll run once
-  more to pick up the change.
+  Ghostty, [mise](https://mise.jdx.dev/), [uv](https://docs.astral.sh/uv/),
+  [scmpuff](https://github.com/mroth/scmpuff), TPM). On Linux it uses
+  zypper (openSUSE), falling back to apt/dnf; `scmpuff` — which has no
+  distro package — is pulled from its GitHub releases via mise's `ubi`
+  backend. Runs once per machine; edit the script and it'll run once more
+  to pick up the change.
 
 ## What changed from dotmac
 
@@ -96,8 +100,23 @@ new shell.
 baked in (`/Users/ajvanerp/google-cloud-sdk/...`, `/Users/ajvanerp/.rd/bin`,
 `/opt/homebrew/bin/brew` unconditionally) that only worked on one specific
 Mac. These are now `$HOME`-relative and gated behind `command -v` / file
-existence checks, plus explicit Linux branches (linuxbrew path, `apt`/`dnf`
+existence checks, plus explicit Linux branches (`zypper`/`apt`/`dnf`
 package names) where the two OSes actually differ.
+
+**Version managers**: pyenv, rbenv, nvm and SDKMAN are gone — replaced by
+[mise](https://mise.jdx.dev/) for language/tool versions and
+[uv](https://docs.astral.sh/uv/) for Python project environments. `.zshrc`
+now just runs `mise activate zsh`; `.zprofile` puts the mise shims dir on
+`PATH` so non-interactive shells resolve managed tools too. The
+`pyenv`/`rbenv`/`nvm` powerlevel10k prompt segments were dropped to match,
+and the unused `pipenv` completion hook went with them. The generic
+`venv` helper and `virtualenv` prompt segment stay — `uv` creates plain
+`.venv`s those still understand.
+
+**No Linuxbrew**: the Linux bootstrap used to install Homebrew purely to
+get `pyenv`/`go`/`scmpuff` at macOS parity. With mise handling those,
+Linuxbrew is dropped entirely — Linux packages come from zypper (openSUSE,
+the common case here) or apt/dnf, and everything else from mise.
 
 **tmux**: dotmac had two tmux configs (`tmux.conf` and `tmux-new.conf`)
 that had clearly drifted apart. This repo keeps only the more complete one

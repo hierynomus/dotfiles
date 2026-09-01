@@ -67,21 +67,12 @@ if which scmpuff > /dev/null 2>&1; then
   eval "$(scmpuff init -s)"
 fi
 
-if which pipenv > /dev/null 2>&1; then
-  eval "$(pipenv --completion)"
+# mise — version manager for languages (python, node, ruby, java, …) and
+# CLI tools. Replaces pyenv/rbenv/nvm/SDKMAN; per-project Python envs are
+# handled by uv. Non-interactive shells get the shims via .zprofile.
+if which mise > /dev/null 2>&1; then
+  eval "$(mise activate zsh)"
 fi
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-{{ if eq .chezmoi.os "darwin" -}}
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-{{ end -}}
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# SDKMAN — this block must stay at the end of the file for sdkman to work.
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Google Cloud SDK
 if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
