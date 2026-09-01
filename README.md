@@ -62,8 +62,9 @@ chezmoi apply             # or -v to preview the diff first
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
   readability and sourced from it automatically.
-- `dot_gitconfig.tmpl` — your git identity and aliases (`st`, `lg`, `lg2`,
-  `ribbon`, `catchup`, etc.), unchanged except for what's listed below.
+- `dot_gitconfig.tmpl` — your git identity and aliases (`st`, `up`, `lg`,
+  `lg2`, `ribbon`, `catchup`, etc.), unchanged except for what's listed
+  below.
 - `dot_tmux.conf.tmpl` + `dot_tmux/` — tmux config and the two helper
   scripts (`yank.sh`, `renew_env.sh`) it calls out to.
 - `dot_config/ghostty/config.tmpl` — Ghostty terminal config. Same file
@@ -133,7 +134,10 @@ aliases updated to match); `core.editor` was `/usr/local/bin/atom -n -w`,
 which no longer exists (Atom was discontinued) — now uses the `editor`
 value you give `chezmoi init`, same as `$EDITOR`; added `pull.rebase` and
 `credential.helper` (osxkeychain on macOS, cache on Linux) since those
-weren't set before.
+weren't set before. The `gu` shell alias no longer needs the
+pip-installed [`git-up`](https://github.com/aanand/git-up) — it's now a
+plain `git up` alias (`pull --rebase --autostash`), which drops the only
+reason the bootstrap script touched pip/pipx at all.
 
 **VS Code**: settings/keybindings otherwise untouched. Only functional
 change: `vs-kubernetes`'s tool paths were hardcoded to one Mac's home

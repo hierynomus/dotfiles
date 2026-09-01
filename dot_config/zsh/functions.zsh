@@ -30,13 +30,14 @@ git_prune_branch() {
   done
 }
 
-# `git-up` every git repo found one level down from the cwd.
+# `git up` (pull --rebase --autostash) every git repo found one level down
+# from the cwd.
 git_pull_all() {
   local i r
   for i in $(find . -name ".git" -type d -depth 2); do
     r="$(dirname "$i")"
     echo "\x1b[33m>>>>>>> Updating $r <<<<<<<<\x1b[0m"
-    (cd "$r" && git-up)
+    (cd "$r" && git up)
     if [[ $? -eq 0 ]]; then
       echo "\x1b[32m<<<<<<<<<< DONE >>>>>>>>>\x1b[0m"
     else

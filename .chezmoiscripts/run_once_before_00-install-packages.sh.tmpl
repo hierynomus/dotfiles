@@ -28,8 +28,6 @@ for c in "${brew_casks[@]}"; do
   brew list --cask "$c" > /dev/null 2>&1 || brew install --cask "$c"
 done
 
-command -v git-up > /dev/null 2>&1 || pip3 install --user --break-system-packages git-up 2>/dev/null || pip3 install --user git-up
-
 # scmpuff via mise's github backend, so it's managed the same way on both
 # OSes (on Linux there's no distro package for it at all).
 mise use -g github:mroth/scmpuff
@@ -39,16 +37,12 @@ mise use -g github:mroth/scmpuff
 # apt/dnf branches are kept for the occasional Debian/Fedora box. No
 # Linuxbrew — mise covers the tools that aren't packaged natively.
 if command -v zypper > /dev/null 2>&1; then
-  sudo zypper --non-interactive install zsh git tmux fzf tree curl python3-pipx
+  sudo zypper --non-interactive install zsh git tmux fzf tree curl
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get update -y
-  sudo apt-get install -y zsh git tmux fzf tree curl fonts-firacode pipx
+  sudo apt-get install -y zsh git tmux fzf tree curl fonts-firacode
 elif command -v dnf > /dev/null 2>&1; then
-  sudo dnf install -y zsh git tmux fzf tree curl pipx
-fi
-
-if command -v pipx > /dev/null 2>&1; then
-  pipx install git-up 2>/dev/null || true
+  sudo dnf install -y zsh git tmux fzf tree curl
 fi
 
 # mise — version manager for languages and CLI tools (replaces pyenv,
