@@ -30,9 +30,9 @@ done
 
 command -v git-up > /dev/null 2>&1 || pip3 install --user --break-system-packages git-up 2>/dev/null || pip3 install --user git-up
 
-# scmpuff via mise's ubi backend, so it's managed the same way on both OSes
-# (on Linux there's no distro package for it at all).
-mise use -g "ubi:mroth/scmpuff[exe=scmpuff]"
+# scmpuff via mise's github backend, so it's managed the same way on both
+# OSes (on Linux there's no distro package for it at all).
+mise use -g github:mroth/scmpuff
 
 {{ else if eq .chezmoi.os "linux" -}}
 # Nearly all of these machines run openSUSE, so zypper is the primary path;
@@ -61,9 +61,9 @@ fi
 MISE="$(command -v mise || echo "$HOME/.local/bin/mise")"
 if [ -x "$MISE" ]; then
   # uv for Python project/venv management, scmpuff (no distro package —
-  # pulled straight from its GitHub releases via mise's ubi backend).
+  # pulled straight from its GitHub releases via mise's github backend).
   "$MISE" use -g uv
-  "$MISE" use -g "ubi:mroth/scmpuff[exe=scmpuff]"
+  "$MISE" use -g github:mroth/scmpuff
 fi
 
 # Nerd Font, for the powerlevel10k prompt icons (GNOME Terminal / Ghostty

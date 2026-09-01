@@ -82,7 +82,7 @@ chezmoi apply             # or -v to preview the diff first
   Ghostty, [mise](https://mise.jdx.dev/), [uv](https://docs.astral.sh/uv/),
   [scmpuff](https://github.com/mroth/scmpuff), TPM). On Linux it uses
   zypper (openSUSE), falling back to apt/dnf; `scmpuff` — which has no
-  distro package — is pulled from its GitHub releases via mise's `ubi`
+  distro package — is pulled from its GitHub releases via mise's `github`
   backend. Runs once per machine; edit the script and it'll run once more
   to pick up the change.
 
