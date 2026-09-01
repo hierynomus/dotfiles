@@ -78,7 +78,8 @@ chezmoi apply             # or -v to preview the diff first
   below).
 - `.chezmoiscripts/run_once_before_00-install-packages.sh.tmpl` — installs
   everything above assumes exists (zsh, git, tmux, fzf, tree, a Nerd Font,
-  Ghostty, TPM). Runs once per machine; edit the script and it'll run once
+  Ghostty, [scmpuff](https://github.com/mroth/scmpuff), TPM). Runs once per
+  machine; edit the script and it'll run once
   more to pick up the change.
 
 ## What changed from dotmac

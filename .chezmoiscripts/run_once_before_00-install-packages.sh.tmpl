@@ -15,7 +15,7 @@ if ! command -v brew > /dev/null 2>&1; then
 fi
 eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
 
-brew_formulas=(zsh git tmux fzf tree pyenv go)
+brew_formulas=(zsh git tmux fzf tree pyenv go scmpuff)
 brew_casks=(ghostty font-jetbrains-mono-nerd-font)
 
 for f in "${brew_formulas[@]}"; do
@@ -48,6 +48,14 @@ if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   brew list pyenv > /dev/null 2>&1 || brew install pyenv
   brew list go > /dev/null 2>&1 || brew install go
+  # scmpuff (github.com/mroth/scmpuff) has no apt/dnf package, only Homebrew
+  # or a manual binary download, so it rides along with the rest of brew.
+  brew list scmpuff > /dev/null 2>&1 || brew install scmpuff
+else
+  echo "NOTE: scmpuff needs Homebrew on Linux (no apt/dnf package exists) and"
+  echo "      Linuxbrew didn't install cleanly above. Grab a binary instead"
+  echo "      from https://github.com/mroth/scmpuff/releases and put it on"
+  echo "      your \$PATH — ~/.zshrc already wires it up if it's present."
 fi
 
 # Nerd Font, for the powerlevel10k prompt icons (GNOME Terminal / Ghostty
