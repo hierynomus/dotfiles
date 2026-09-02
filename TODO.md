@@ -46,13 +46,15 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
 - [x] **CI** — `.github/workflows/ci.yml`: renders every template and
       dry-runs `chezmoi apply` on Linux + macOS, `shellcheck`s the
       bootstrap scripts across every machine-type branch.
+- [x] **Custom p10k `mise` segment** — `prompt_mise` in `dot_p10k.zsh`
+      (added to `RIGHT_PROMPT_ELEMENTS`). Shows `name version` pairs from
+      `mise ls --local` for the tools a project-local config pins; hidden
+      in `$HOME` / global-only dirs. Runs `mise` (with `MISE_OFFLINE=1`)
+      only when the nearest local config's mtime changes; a few `stat()`s
+      per prompt otherwise.
 
 ## Next (recommended)
 
-- [ ] **Custom p10k `mise` prompt fragment** — p10k has no native mise segment.
-      Write a `prompt_mise` segment (or a `POWERLEVEL9K_CUSTOM_*` command)
-      that shows active tool versions from `mise current` and add it back to
-      `RIGHT_PROMPT_ELEMENTS` in `dot_p10k.zsh` where the removed block was.
 - [ ] **Move first-run secrets into the repo** — once the age key exists,
       `chezmoi add --encrypt` the SSH config, git signing key, `~/.netrc`,
       cloud tokens.

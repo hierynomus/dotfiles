@@ -67,7 +67,10 @@ chezmoi apply             # or -v to preview the diff first
   zshrc), just without prezto itself.
 - `dot_zsh_plugins.txt` — antidote's plugin bundle file. Add a line, open a
   new shell, antidote recompiles automatically.
-- `dot_p10k.zsh` — your existing powerlevel10k config, carried over as-is.
+- `dot_p10k.zsh` — powerlevel10k config, carried over from dotmac. Only
+  change: the built-in language version-manager segments were dropped and
+  replaced with a custom `mise` segment (`prompt_mise`) that shows the
+  tool versions a project-local mise config pins.
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
   readability and sourced from it automatically. `aliases.zsh` points

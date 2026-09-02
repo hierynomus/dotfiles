@@ -46,10 +46,10 @@
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
     virtualenv              # python venv / uv .venv (https://docs.python.org/3/library/venv.html)
-    # The language version-manager segments (asdf, goenv, nodenv, rvm, jenv,
-    # perlbrew, anaconda, …) and the direnv segment were removed: mise is the
-    # only version manager now and p10k has no native mise segment.
-    # TODO(TODO.md): write a custom `mise` prompt fragment and add it back here.
+    mise                    # active mise tool versions — custom segment, see prompt_mise below
+    # The built-in language version-manager segments (asdf, goenv, nodenv,
+    # rvm, jenv, perlbrew, anaconda, …) and direnv were removed: mise is the
+    # only version manager now, and the `mise` segment above replaces them.
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
     # terraform_version     # terraform version (https://www.terraform.io)
@@ -1764,6 +1764,55 @@
   typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=3
   typeset -g POWERLEVEL9K_EXAMPLE_BACKGROUND=1
   # typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########################[ mise: active tool versions (custom) ]##########################
+  # Powerlevel10k has no built-in mise segment, so this replaces the removed
+  # asdf/pyenv/nodenv/... segments. It shows `name version` pairs for the
+  # tools a *project-local* mise config pins (mise.toml, .tool-versions, …)
+  # and stays hidden in $HOME and global-only directories.
+  #
+  # Cost: a few stat() calls per prompt. `mise` itself is only run when the
+  # nearest local config's mtime changes — so if you edit a config in place
+  # and the versions look stale, `cd` out and back or start a new shell.
+  zmodload -F zsh/stat b:zstat 2>/dev/null
+
+  function prompt_mise() {
+    (( $+commands[mise] )) || return
+
+    local global_cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml
+    local dir=$PWD cfg= f
+    while [[ -n $dir && $dir != $HOME && $dir != / ]]; do
+      for f in mise.toml mise.local.toml .mise.toml .mise.local.toml .tool-versions; do
+        [[ $dir/$f != $global_cfg && -e $dir/$f ]] && { cfg=$dir/$f; break 2; }
+      done
+      dir=${dir:h}
+    done
+    [[ -n $cfg ]] || return
+
+    local -a st
+    zstat -A st +mtime $cfg 2>/dev/null || return
+    local key=$cfg$'\1'$st[1]
+    if [[ ${_prompt_mise_key-} != $key ]]; then
+      typeset -g _prompt_mise_key=$key _prompt_mise_text=
+      local line
+      local -a p
+      # MISE_OFFLINE keeps this from ever blocking the prompt on a network
+      # call to resolve "latest"; --no-header for older mise safety.
+      while IFS= read -r line; do
+        p=(${(z)line})
+        (( $#p >= 2 )) || continue
+        [[ $p[1] == Tool && $p[2] == Version ]] && continue
+        _prompt_mise_text+="${_prompt_mise_text:+ }${p[1]##*:} ${p[2]}"
+      done < <(MISE_OFFLINE=1 command mise ls --local --no-header 2>/dev/null)
+    fi
+
+    [[ -n $_prompt_mise_text ]] || return
+    p10k segment -i '⬢' -t "$_prompt_mise_text"
+  }
+
+  typeset -g POWERLEVEL9K_MISE_FOREGROUND=0
+  typeset -g POWERLEVEL9K_MISE_BACKGROUND=6
+  # typeset -g POWERLEVEL9K_MISE_VISUAL_IDENTIFIER_EXPANSION='⬢'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:
