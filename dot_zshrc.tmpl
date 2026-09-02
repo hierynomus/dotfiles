@@ -67,6 +67,12 @@ if which scmpuff > /dev/null 2>&1; then
   eval "$(scmpuff init -s)"
 fi
 
+# fzf shell integration: Ctrl-R history search, Ctrl-T file picker, Alt-C
+# cd. `fzf --zsh` is fzf >= 0.48; older builds just print nothing here.
+if which fzf > /dev/null 2>&1; then
+  source <(fzf --zsh 2>/dev/null)
+fi
+
 # mise — version manager for languages (python, node, ruby, java, …) and
 # CLI tools. Replaces pyenv/rbenv/nvm/SDKMAN; per-project Python envs are
 # handled by uv. Non-interactive shells get the shims via .zprofile.

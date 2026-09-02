@@ -4,14 +4,19 @@
      verbatim to ~/fonts. */}}
 fonts
 
-{{/* VS Code stores settings in a different absolute path per OS. Both
-     variants are checked into the source dir; this file hides whichever
-     one doesn't apply to the machine chezmoi is running on. */}}
+{{/* Repo housekeeping — these are not dotfiles and must not land in $HOME. */}}
+README.md
+TODO.md
+LICENSE
+.github
+
+{{/* VS Code settings live under a different absolute path per OS; the
+     source tree carries both. Ignore the whole tree that doesn't apply
+     to this machine (not just the leaf files) so no empty parent dirs
+     get created either. */}}
 {{ if ne .chezmoi.os "darwin" -}}
-Library/Application Support/Code/User/settings.json
-Library/Application Support/Code/User/keybindings.json
+Library
 {{ end -}}
 {{ if eq .chezmoi.os "darwin" -}}
-.config/Code/User/settings.json
-.config/Code/User/keybindings.json
+.config/Code
 {{ end -}}
