@@ -15,10 +15,11 @@ if ! command -v brew > /dev/null 2>&1; then
 fi
 eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
 
-# Version-managed languages (python, node, ruby, java, …) are handled by
-# mise; per-project Python environments by uv. Neither pyenv/rbenv/nvm nor
-# SDKMAN is installed here anymore.
-brew_formulas=(zsh git tmux fzf tree go mise uv)
+# Languages and most CLI tools are handled by mise (see the global
+# ~/.config/mise/config.toml and run_onchange_after_20-mise-install.sh);
+# uv/node/python/scmpuff/etc. are pinned there, not installed here.
+# pyenv/rbenv/nvm/SDKMAN are gone entirely.
+brew_formulas=(zsh git tmux fzf tree go mise age)
 # The Nerd Font for the prompt is installed from the repo's bundled TTFs
 # by run_onchange_after_10-install-fonts.sh, not via a cask.
 brew_casks=(ghostty)
@@ -30,36 +31,26 @@ for c in "${brew_casks[@]}"; do
   brew list --cask "$c" > /dev/null 2>&1 || brew install --cask "$c"
 done
 
-# scmpuff via mise's github backend, so it's managed the same way on both
-# OSes (on Linux there's no distro package for it at all).
-mise use -g github:mroth/scmpuff
-
 {{ else if eq .chezmoi.os "linux" -}}
 # Nearly all of these machines run openSUSE, so zypper is the primary path;
 # apt/dnf branches are kept for the occasional Debian/Fedora box. No
 # Linuxbrew — mise covers the tools that aren't packaged natively.
 if command -v zypper > /dev/null 2>&1; then
-  sudo zypper --non-interactive install zsh git tmux fzf tree curl
+  sudo zypper --non-interactive install zsh git tmux fzf tree curl age
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get update -y
-  sudo apt-get install -y zsh git tmux fzf tree curl fonts-firacode
+  sudo apt-get install -y zsh git tmux fzf tree curl fonts-firacode age
 elif command -v dnf > /dev/null 2>&1; then
-  sudo dnf install -y zsh git tmux fzf tree curl
+  sudo dnf install -y zsh git tmux fzf tree curl age
 fi
 
 # mise — version manager for languages and CLI tools (replaces pyenv,
 # rbenv, nvm, SDKMAN). Installs to ~/.local/bin, which is already on PATH.
+# The tools it manages are pinned in ~/.config/mise/config.toml and
+# installed by run_onchange_after_20-mise-install.sh once that's applied.
 if ! command -v mise > /dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
   echo "==> Installing mise"
   curl -fsSL https://mise.run | sh
-fi
-
-MISE="$(command -v mise || echo "$HOME/.local/bin/mise")"
-if [ -x "$MISE" ]; then
-  # uv for Python project/venv management, scmpuff (no distro package —
-  # pulled straight from its GitHub releases via mise's github backend).
-  "$MISE" use -g uv
-  "$MISE" use -g github:mroth/scmpuff
 fi
 
 # Nerd Font for the powerlevel10k prompt icons is installed by
@@ -73,10 +64,8 @@ if ! command -v ghostty > /dev/null 2>&1; then
 fi
 {{ end -}}
 
-# Tmux Plugin Manager — ~/.tmux.conf's `run` line expects this to exist.
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-  git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-fi
+# antidote (~/.antidote) and TPM (~/.tmux/plugins/tpm) are cloned and kept
+# up to date by chezmoi via .chezmoiexternal.toml — nothing to do here.
 
 echo "==> Done. Open a new shell, then inside tmux press prefix+I to fetch plugins."
 echo "==> Run 'p10k configure' the first time you want to tweak the prompt."

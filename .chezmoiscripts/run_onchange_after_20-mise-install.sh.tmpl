@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Installs every tool pinned in the global mise config. Re-runs whenever
+# that config changes (its hash is embedded below).
+#
+# ~/.config/mise/config.toml sha256: {{ include "dot_config/mise/config.toml" | sha256sum }}
+set -euo pipefail
+
+MISE="$(command -v mise || echo "$HOME/.local/bin/mise")"
+if [ ! -x "$MISE" ]; then
+  echo "NOTE: mise not found — skipping global tool install." >&2
+  exit 0
+fi
+
+echo "==> mise install (global tools)"
+"$MISE" install

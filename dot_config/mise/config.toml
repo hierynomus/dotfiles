@@ -1,0 +1,23 @@
+# Global mise config (~/.config/mise/config.toml). Per-project versions
+# still come from a repo-local mise.toml / .tool-versions; this is the
+# baseline every machine gets. The run_onchange_ mise script runs
+# `mise install` for everything listed here on `chezmoi apply`.
+#
+#   mise use -g <tool>@<ver>   pin another global tool (edits this file)
+#   mise ls / mise outdated    what's installed / what's stale
+#   mise upgrade               update within the pinned ranges
+
+[tools]
+node = "lts"
+python = "3.13"
+uv = "latest"
+bun = "latest"
+"npm:playwright" = "latest"
+# scmpuff has no distro package; pulled from GitHub releases. ~/.zshrc
+# runs `scmpuff init` when it's on PATH.
+"github:mroth/scmpuff" = "latest"
+
+[settings]
+gpg_verify = false
+# Reuse the already-installed uv for mise-managed Python virtualenvs.
+python.uv_venv_auto = true

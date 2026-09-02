@@ -1,0 +1,11 @@
+# Never commit an age/GPG private key, even if one gets dropped in here by
+# mistake. Encrypted secrets live as encrypted_*.age files, which ARE
+# committed; the key that decrypts them is not.
+key.txt
+*.key
+*.pem
+identity.txt
+
+# chezmoi's own generated config (only exists in ~/.config/chezmoi, but
+# guard against a stray copy).
+chezmoi.toml

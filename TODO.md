@@ -17,6 +17,22 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
 - [x] **No more empty `~/Library/.../Code` tree on Linux** (and `~/.config/Code`
       on macOS) — `.chezmoiignore` now ignores the whole non-applicable tree,
       not just the leaf JSON files.
+- [x] **`.chezmoiexternal.toml`** — antidote (`~/.antidote`) and TPM
+      (`~/.tmux/plugins/tpm`) are now chezmoi `git-repo` externals with a
+      168h `refreshPeriod`; the hand-rolled `git clone`s are gone from the
+      bootstrap script (a fallback antidote clone stays in `.zshrc` for a
+      shell opened before the first apply). `chezmoi apply --refresh-externals`
+      to force an update.
+- [x] **`dot_config/mise/config.toml`** — global mise config checked in
+      (node lts, python 3.13, uv, bun, playwright, scmpuff via `github:`;
+      `python.uv_venv_auto`, `gpg_verify=false`). `run_onchange_after_20-mise-install.sh`
+      runs `mise install` when it changes; the per-tool `mise use -g` calls
+      are gone from the bootstrap script.
+- [x] **Secrets handling** — age encryption scaffolded: `age` added to the
+      package installs, `.chezmoi.toml.tmpl` prompts for the `ageRecipient`
+      public key and wires up `encryption`/`[age]` when given, `.gitignore`
+      blocks private keys, README has the `age-keygen` setup flow. No
+      secrets committed yet — add them with `chezmoi add --encrypt`.
 
 ## Next (recommended)
 
@@ -24,14 +40,9 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       Write a `prompt_mise` segment (or a `POWERLEVEL9K_CUSTOM_*` command)
       that shows active tool versions from `mise current` and add it back to
       `RIGHT_PROMPT_ELEMENTS` in `dot_p10k.zsh` where the removed block was.
-- [ ] **`.chezmoiexternal.toml`** — manage antidote + TPM as chezmoi externals
-      with `refreshPeriod` instead of one-shot `git clone` in the bootstrap
-      script. Reproducible + auto-updating.
-- [ ] **`dot_config/mise/config.toml`** — check in a global mise config with
-      default tools (node, python, …) and settings.
-- [ ] **Secrets handling** — set up age encryption (`chezmoi add --encrypt`)
-      or a password-manager template for: SSH config/keys, git signing key,
-      `~/.netrc`, cloud tokens. Currently nothing.
+- [ ] **Move first-run secrets into the repo** — once the age key exists,
+      `chezmoi add --encrypt` the SSH config, git signing key, `~/.netrc`,
+      cloud tokens.
 
 ## Backlog
 

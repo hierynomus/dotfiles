@@ -86,15 +86,42 @@ chezmoi apply             # or -v to preview the diff first
   carried over as plain files (iTerm2's own settings are a macOS plist,
   not something worth templating — see the iTerm2/GNOME Terminal note
   below).
-- `.chezmoiscripts/run_once_before_00-install-packages.sh.tmpl` — installs
-  everything above assumes exists (zsh, git, tmux, fzf, tree, Ghostty,
-  [mise](https://mise.jdx.dev/), [uv](https://docs.astral.sh/uv/),
-  [scmpuff](https://github.com/mroth/scmpuff), TPM; the Nerd Font comes
-  from `fonts/` via the font script above). On Linux it uses zypper
-  (openSUSE), falling back to apt/dnf; `scmpuff` — which has no distro
-  package — is pulled from its GitHub releases via mise's `github`
-  backend. Runs once per machine; edit the script and it'll run once more
-  to pick up the change.
+- `dot_config/mise/config.toml` — the global [mise](https://mise.jdx.dev/)
+  config: the baseline tool versions every machine gets (node, python,
+  uv, bun, scmpuff, …). Per-project versions still come from a repo-local
+  `mise.toml`.
+- `.chezmoiexternal.toml` — third-party repos chezmoi clones and keeps
+  updated (`~/.antidote`, `~/.tmux/plugins/tpm`) instead of one-off
+  `git clone`s. `chezmoi apply --refresh-externals` forces an update.
+- `.chezmoiscripts/` — ordered setup scripts:
+  - `run_once_before_00-install-packages.sh.tmpl` installs the base
+    packages (zsh, git, tmux, fzf, tree, Ghostty, mise, `age`). On Linux
+    it uses zypper (openSUSE), falling back to apt/dnf.
+  - `run_onchange_after_10-install-fonts.sh.tmpl` installs the bundled
+    Nerd Font (see `fonts/`).
+  - `run_onchange_after_20-mise-install.sh.tmpl` runs `mise install` for
+    everything in the global mise config; re-runs when that config
+    changes.
+
+## Secrets
+
+Encrypted files (`encrypted_*.age` in the source) are decrypted with
+[age](https://age-encryption.org/) on `chezmoi apply`. One-time setup:
+
+```sh
+# once, on any machine — generates the key pair
+age-keygen -o ~/.config/chezmoi/key.txt        # prints "Public key: age1..."
+
+# tell chezmoi about the public key (re-prompts and caches it)
+chezmoi init                                     # paste age1... at the prompt
+
+# copy ~/.config/chezmoi/key.txt to every other machine, out of band
+```
+
+Then add secrets with `chezmoi add --encrypt ~/.ssh/config` (etc.) — the
+source copy is encrypted and safe to commit. Machines without the key
+just leave `ageRecipient` blank at the `chezmoi init` prompt and skip the
+encrypted files.
 
 ## What changed from dotmac
 

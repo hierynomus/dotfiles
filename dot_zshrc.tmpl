@@ -8,6 +8,9 @@ fi
 #
 # antidote — plugin manager. Loads the static bundle if it's up to date,
 # rebuilds it if .zsh_plugins.txt changed since the last shell start.
+# ~/.antidote itself is cloned/updated by chezmoi (.chezmoiexternal.toml);
+# the clone below is only a fallback for a shell started before the first
+# `chezmoi apply` has run.
 #
 ANTIDOTE_HOME="${ZDOTDIR:-$HOME}/.antidote"
 if [[ ! -d "$ANTIDOTE_HOME" ]]; then

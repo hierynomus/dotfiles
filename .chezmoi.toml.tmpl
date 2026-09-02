@@ -4,8 +4,19 @@
 {{ $name := promptStringOnce . "name" "Git name" "Jeroen van Erp" -}}
 {{ $email := promptStringOnce . "email" "Git email" "jeroen@hierynomus.com" -}}
 {{ $editor := promptStringOnce . "editor" "Preferred $EDITOR (command)" "code -n -w" -}}
+{{/* age public key for encrypted_* files. Leave blank on machines that
+     don't need to decrypt secrets. See "Secrets" in README.md for setup. */}}
+{{ $ageRecipient := promptStringOnce . "ageRecipient" "age recipient (public key), blank to skip" "" -}}
+
+{{ if $ageRecipient -}}
+encryption = "age"
+[age]
+    identity = {{ printf "%s/.config/chezmoi/key.txt" .chezmoi.homeDir | quote }}
+    recipient = {{ $ageRecipient | quote }}
+{{ end -}}
 
 [data]
     name = {{ $name | quote }}
     email = {{ $email | quote }}
     editor = {{ $editor | quote }}
+    ageRecipient = {{ $ageRecipient | quote }}

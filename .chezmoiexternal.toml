@@ -1,0 +1,15 @@
+# Third-party repos that used to be git-cloned by hand (in the bootstrap
+# script and .zshrc). chezmoi now clones them on `chezmoi apply` and runs
+# `git pull` at most once per refreshPeriod, so a fresh machine is
+# reproducible and they stay current without a manual update step.
+# Force a refresh now with `chezmoi apply --refresh-externals`.
+
+[".antidote"]
+    type = "git-repo"
+    url = "https://github.com/mattmc3/antidote.git"
+    refreshPeriod = "168h"
+
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm.git"
+    refreshPeriod = "168h"
