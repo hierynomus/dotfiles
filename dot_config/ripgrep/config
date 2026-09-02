@@ -1,0 +1,6 @@
+# ripgrep config — loaded via $RIPGREP_CONFIG_PATH (set in ~/.zshenv).
+--smart-case
+--hidden
+--glob=!.git/
+--max-columns=200
+--max-columns-preview

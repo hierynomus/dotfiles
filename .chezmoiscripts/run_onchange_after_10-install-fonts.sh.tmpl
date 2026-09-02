@@ -17,9 +17,10 @@ DEST="$HOME/Library/Fonts"
 DEST="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
 {{ end -}}
 
+ttfs=("$SRC"/*.ttf)
 mkdir -p "$DEST"
-cp -f "$SRC"/*.ttf "$DEST"/
-echo "==> Installed $(ls "$SRC"/*.ttf | wc -l | tr -d ' ') font files to $DEST"
+cp -f "${ttfs[@]}" "$DEST"/
+echo "==> Installed ${#ttfs[@]} font files to $DEST"
 
 {{ if ne .chezmoi.os "darwin" -}}
 if command -v fc-cache > /dev/null 2>&1; then

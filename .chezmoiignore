@@ -20,3 +20,13 @@ Library
 {{ if eq .chezmoi.os "darwin" -}}
 .config/Code
 {{ end -}}
+
+{{/* Headless machines get the shell/CLI setup only — no GUI config. */}}
+{{ if not .gui -}}
+.config/ghostty
+.config/iterm2
+.config/Code
+Library
+fonts
+.chezmoiscripts/10-install-fonts.sh
+{{ end -}}

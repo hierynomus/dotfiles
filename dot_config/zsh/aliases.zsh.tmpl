@@ -4,8 +4,15 @@ alias gu="git up"                 # git alias: pull --rebase --autostash
 alias gitrm="git ls-files -d | xargs git rm"
 alias gs='git status'
 
-{{ if eq .chezmoi.os "darwin" -}}
-alias ls='ls -G'
-{{ else -}}
-alias ls='ls --color=auto'
-{{ end -}}
+# ls -> eza when available (mise installs it), else plain ls with colour.
+if (( $+commands[eza] )); then
+  alias ls='eza --group-directories-first'
+  alias ll='eza -l  --group-directories-first --git'
+  alias la='eza -la --group-directories-first --git'
+  alias lt='eza --tree --level=2 --group-directories-first'
+else
+  alias ls={{ if eq .chezmoi.os "darwin" }}'ls -G'{{ else }}'ls --color=auto'{{ end }}
+fi
+
+# `bat` stays `bat` (config in ~/.config/bat/config); handy pager alias.
+(( $+commands[bat] )) && alias catp='bat --paging=never'

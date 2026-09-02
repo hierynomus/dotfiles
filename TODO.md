@@ -33,6 +33,19 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       public key and wires up `encryption`/`[age]` when given, `.gitignore`
       blocks private keys, README has the `age-keygen` setup flow. No
       secrets committed yet — add them with `chezmoi add --encrypt`.
+- [x] **Machine-type prompt** — `.chezmoi.toml.tmpl` now asks `machineType`
+      (personal / work / headless) and `privileged`. `headless` drops all
+      GUI config via `.chezmoiignore` (Ghostty, VS Code, iTerm2, fonts);
+      `privileged=false` skips the `sudo` package install and the Ghostty
+      cask.
+- [x] **`.chezmoiversion`** — pinned to `2.60.0`.
+- [x] **Modern CLI tools** — `zoxide`, `eza`, `bat`, `fd`, `ripgrep` added
+      to the global mise config. `.zshrc` wires `zoxide`; `aliases.zsh`
+      points `ls` at `eza`; `dot_config/{bat,ripgrep}/config` +
+      `$RIPGREP_CONFIG_PATH` in `.zshenv`.
+- [x] **CI** — `.github/workflows/ci.yml`: renders every template and
+      dry-runs `chezmoi apply` on Linux + macOS, `shellcheck`s the
+      bootstrap scripts across every machine-type branch.
 
 ## Next (recommended)
 
@@ -46,23 +59,14 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
 
 ## Backlog
 
-- [ ] `.chezmoi.toml.tmpl`: `promptChoiceOnce` machine type (personal / work /
-      headless); gate GUI config (Ghostty, VS Code, fonts) and sudo package
-      installs behind it so the repo works on a server.
-- [ ] `.chezmoiversion` — require a minimum chezmoi version.
 - [ ] git config: `[includeIf "gitdir:~/work/"]` for a second identity /
       signing key; `delta` as diff pager; `rerere.enabled`, `fetch.prune`;
       promote `rebase.autostash` from the `up` alias to a global setting.
 - [ ] macOS `defaults` script (`run_onchange_darwin-*.sh.tmpl`) — Dock,
       Finder, key-repeat, screenshot location.
 - [ ] Linux GNOME `dconf` / `gsettings` script (or document the manual steps).
-- [ ] Modern CLI tools + config: `zoxide` (`eval "$(zoxide init zsh)"`),
-      `eza`, `bat` (`dot_config/bat/config`), `fd`, `ripgrep` config.
-      Install via mise / zypper.
 - [ ] VS Code extensions — checked-in list installed by a `run_onchange_`
       script (`code --install-extension`).
-- [ ] CI — GitHub Actions running `chezmoi apply` + `chezmoi verify` in a
-      container and `shellcheck` on the scripts.
 - [ ] `zcompile` the `dot_config/zsh/*.zsh` files / cache the compinit dump
       for faster shell startup.
 - [ ] Small niceties: `dot_hushlogin`, `dot_editorconfig`.

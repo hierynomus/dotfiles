@@ -8,6 +8,11 @@ export LANG=en_US.UTF-8
 export EDITOR={{ .editor | quote }}
 export VISUAL={{ .editor | quote }}
 
+# ripgrep reads its default flags from this file (see ~/.config/ripgrep/config).
+if [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/ripgrep/config" ]]; then
+  export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/ripgrep/config"
+fi
+
 {{ if eq .chezmoi.os "darwin" -}}
 # Cargo/Rust
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

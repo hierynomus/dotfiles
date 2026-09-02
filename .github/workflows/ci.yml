@@ -1,0 +1,82 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  chezmoi:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Write a CI chezmoi config
+        run: |
+          mkdir -p "$HOME/.config/chezmoi"
+          cat > "$HOME/.config/chezmoi/chezmoi.toml" <<'EOF'
+          [data]
+              name = "CI"
+              email = "ci@example.com"
+              editor = "vi"
+              machineType = "personal"
+              gui = true
+              privileged = false
+              ageRecipient = ""
+          EOF
+
+      - name: Lint the config template (renders with prompt defaults)
+        run: chezmoi execute-template --init --no-tty --source="$PWD" < .chezmoi.toml.tmpl > /dev/null
+
+      - name: Render every template
+        run: |
+          set -euo pipefail
+          while IFS= read -r f; do
+            [ "$f" = ".chezmoi.toml.tmpl" ] && continue
+            echo "== $f =="
+            chezmoi execute-template --source="$PWD" < "$f" > /dev/null
+          done < <(git ls-files '*.tmpl')
+
+      - name: Dry-run apply
+        run: |
+          chezmoi apply --dry-run --verbose --source="$PWD" \
+            --exclude=externals,scripts,encrypted
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Shellcheck rendered scripts (every privileged/gui branch)
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.config/chezmoi"
+          rc=0
+          for priv in true false; do
+            for gui in true false; do
+              printf '[data]\n  name="CI"\n  email="ci@example.com"\n  editor="vi"\n  machineType="personal"\n  gui=%s\n  privileged=%s\n  ageRecipient=""\n' \
+                "$gui" "$priv" > "$HOME/.config/chezmoi/chezmoi.toml"
+              for f in .chezmoiscripts/*.sh.tmpl; do
+                echo "== priv=$priv gui=$gui $f =="
+                chezmoi execute-template --source="$PWD" < "$f" | shellcheck -s bash - || rc=1
+              done
+            done
+          done
+          exit $rc

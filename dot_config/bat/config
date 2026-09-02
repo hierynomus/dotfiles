@@ -1,0 +1,4 @@
+# bat config (https://github.com/sharkdp/bat). Installed via mise.
+--theme="Solarized (dark)"
+--style="numbers,changes,header"
+--italic-text=always

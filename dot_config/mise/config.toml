@@ -17,6 +17,15 @@ bun = "latest"
 # runs `scmpuff init` when it's on PATH.
 "github:mroth/scmpuff" = "latest"
 
+# Modern CLI tools — same version everywhere, no sudo. Shell wiring:
+# zoxide -> `z` (see ~/.zshrc); eza -> ls aliases (~/.config/zsh/aliases.zsh);
+# bat/ripgrep read ~/.config/{bat,ripgrep}/config.
+zoxide = "latest"
+eza = "latest"
+bat = "latest"
+fd = "latest"
+ripgrep = "latest"
+
 [settings]
 gpg_verify = false
 # Reuse the already-installed uv for mise-managed Python virtualenvs.

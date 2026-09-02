@@ -16,12 +16,21 @@ sh -c "$(curl -fsLS get.chezmoi.io)"
 chezmoi init --apply <your-github-username>/<this-repo-name>
 ```
 
-`chezmoi init` will ask three questions the first time (git name, git email,
-`$EDITOR`) and cache the answers per-machine in
-`~/.config/chezmoi/chezmoi.toml`. `--apply` runs the package-bootstrap
-script (Homebrew on macOS; zypper/apt/dnf on Linux; then mise + uv,
-antidote, the bundled Nerd Font, tmux plugin manager) and then
-symlinks/writes everything into place.
+`chezmoi init` prompts the first time and caches the answers per-machine
+in `~/.config/chezmoi/chezmoi.toml`:
+
+- **git name / email / `$EDITOR`**
+- **machine type** — `personal` / `work` / `headless`. `headless` skips
+  all GUI config (Ghostty, VS Code, iTerm2, fonts).
+- **privileged** — whether the bootstrap script may `sudo` to install
+  system packages (say no on locked-down boxes and install them yourself).
+- **age recipient** — public key for encrypted files; blank to skip (see
+  [Secrets](#secrets)).
+
+`--apply` then runs the package-bootstrap script (Homebrew on macOS;
+zypper/apt/dnf on Linux; then mise, the bundled Nerd Font) and
+symlinks/writes everything into place. `mise install` pulls the tools
+pinned in `~/.config/mise/config.toml`.
 
 After that:
 
@@ -61,7 +70,12 @@ chezmoi apply             # or -v to preview the diff first
 - `dot_p10k.zsh` — your existing powerlevel10k config, carried over as-is.
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
-  readability and sourced from it automatically.
+  readability and sourced from it automatically. `aliases.zsh` points
+  `ls` at `eza` when it's installed.
+- `dot_config/bat/config`, `dot_config/ripgrep/config` — defaults for
+  `bat` and `ripgrep` (the latter via `$RIPGREP_CONFIG_PATH`, set in
+  `.zshenv`). Both tools, plus `eza`, `fd` and `zoxide`, are installed by
+  mise; `.zshrc` wires up `zoxide` (`z <dir>`).
 - `dot_gitconfig.tmpl` — your git identity and aliases (`st`, `up`, `lg`,
   `lg2`, `ribbon`, `catchup`, etc.), unchanged except for what's listed
   below.
@@ -93,6 +107,11 @@ chezmoi apply             # or -v to preview the diff first
 - `.chezmoiexternal.toml` — third-party repos chezmoi clones and keeps
   updated (`~/.antidote`, `~/.tmux/plugins/tpm`) instead of one-off
   `git clone`s. `chezmoi apply --refresh-externals` forces an update.
+- `.chezmoiversion` — minimum chezmoi version; `chezmoi` refuses to run
+  against an older one.
+- `.github/workflows/ci.yml` — on every push/PR, renders every template
+  and dry-runs `chezmoi apply` on Linux + macOS, and `shellcheck`s the
+  bootstrap scripts across each machine-type branch.
 - `.chezmoiscripts/` — ordered setup scripts:
   - `run_once_before_00-install-packages.sh.tmpl` installs the base
     packages (zsh, git, tmux, fzf, tree, Ghostty, mise, `age`). On Linux
