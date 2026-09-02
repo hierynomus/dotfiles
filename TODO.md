@@ -53,6 +53,13 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       only when the nearest local config's mtime changes; a few `stat()`s
       per prompt otherwise.
 
+- [x] **git config** — `rebase.autoStash`, `fetch.prune`, `rerere.enabled`,
+      `merge.conflictStyle=zdiff3`, `diff.algorithm=histogram`, and `delta`
+      as the pager (gated on delta being installed — it's in the mise
+      config). `up` alias simplified to `pull --rebase`. Separate work
+      identity for `~/src/suse` + `~/src/suse-tmm` via `[includeIf]` →
+      `~/.config/git/work`, from the `workName`/`workEmail` init prompts.
+
 ## Next (recommended)
 
 - [ ] **Move first-run secrets into the repo** — once the age key exists,
@@ -61,9 +68,6 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
 
 ## Backlog
 
-- [ ] git config: `[includeIf "gitdir:~/work/"]` for a second identity /
-      signing key; `delta` as diff pager; `rerere.enabled`, `fetch.prune`;
-      promote `rebase.autostash` from the `up` alias to a global setting.
 - [ ] macOS `defaults` script (`run_onchange_darwin-*.sh.tmpl`) — Dock,
       Finder, key-repeat, screenshot location.
 - [ ] Linux GNOME `dconf` / `gsettings` script (or document the manual steps).

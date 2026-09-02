@@ -1,34 +1,61 @@
 [user]
-    name = {{ .name }}
-    email = {{ .email }}
+	name = {{ .name }}
+	email = {{ .email }}
 [init]
-    defaultBranch = main
+	defaultBranch = main
 [pull]
-    rebase = true
+	rebase = true
+[rebase]
+	autoStash = true
 [push]
-    autoSetupRemote = true
+	autoSetupRemote = true
+[fetch]
+	prune = true
+[rerere]
+	enabled = true
+[merge]
+	conflictStyle = zdiff3
+[diff]
+	algorithm = histogram
+	colorMoved = default
 [core]
-    quotepath = false
-    autocrlf = input
-    editor = {{ .editor }}
-    excludesfile = ~/.config/git/ignore
+	quotepath = false
+	autocrlf = input
+	editor = {{ .editor }}
+	excludesfile = ~/.config/git/ignore
+{{ if or (lookPath "delta") (stat (printf "%s/.local/share/mise/shims/delta" .chezmoi.homeDir)) -}}
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+{{ end -}}
 [color]
-    ui = true
-    status = auto
-    diff = auto
+	ui = true
+	status = auto
+	diff = auto
 [alias]
-    st = status -s
-    ci = commit
-    co = checkout
-    up = pull --rebase --autostash
-    lg = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%Cblue%an, %Cgreen%cr)%Creset' --abbrev-commit --all
-    lg2 = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit
-    ribbon = tag --force _ribbon origin/main
-    catchup = log --patch --reverse --topo-order _ribbon..origin/main
+	st = status -s
+	ci = commit
+	co = checkout
+	up = pull --rebase
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%Cblue%an, %Cgreen%cr)%Creset' --abbrev-commit --all
+	lg2 = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit
+	ribbon = tag --force _ribbon origin/main
+	catchup = log --patch --reverse --topo-order _ribbon..origin/main
 {{ if eq .chezmoi.os "darwin" -}}
 [credential]
-    helper = osxkeychain
+	helper = osxkeychain
 {{ else -}}
 [credential]
-    helper = cache --timeout=28800
+	helper = cache --timeout=28800
+{{ end -}}
+{{ if .workEmail }}
+# Work identity for repos checked out under ~/src/suse and ~/src/suse-tmm.
+# The [user] override lives in ~/.config/git/work (chezmoi: dot_config/git/work.tmpl).
+[includeIf "gitdir:~/src/suse/"]
+	path = ~/.config/git/work
+[includeIf "gitdir:~/src/suse-tmm/"]
+	path = ~/.config/git/work
 {{ end -}}

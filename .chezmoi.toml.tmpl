@@ -8,6 +8,10 @@
      "headless" box gets only the shell/CLI setup. */}}
 {{ $machineType := promptChoiceOnce . "machineType" "Machine type" (list "personal" "work" "headless") "personal" -}}
 {{ $privileged := promptBoolOnce . "privileged" "May the bootstrap script install system packages with sudo" true -}}
+{{/* Separate git identity for repos under ~/src/suse and ~/src/suse-tmm.
+     Blank to use the identity above everywhere. */}}
+{{ $workName := promptStringOnce . "workName" "Work git name (blank to skip)" $name -}}
+{{ $workEmail := promptStringOnce . "workEmail" "Work git email for ~/src/suse, ~/src/suse-tmm (blank to skip)" "" -}}
 {{/* age public key for encrypted_* files. Leave blank on machines that
      don't need to decrypt secrets. See "Secrets" in README.md for setup. */}}
 {{ $ageRecipient := promptStringOnce . "ageRecipient" "age recipient (public key), blank to skip" "" -}}
@@ -26,4 +30,6 @@ encryption = "age"
     machineType = {{ $machineType | quote }}
     gui = {{ ne $machineType "headless" }}
     privileged = {{ $privileged }}
+    workName = {{ $workName | quote }}
+    workEmail = {{ $workEmail | quote }}
     ageRecipient = {{ $ageRecipient | quote }}

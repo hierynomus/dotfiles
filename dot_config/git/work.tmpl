@@ -1,0 +1,16 @@
+{{- if .workEmail -}}
+# Work git identity. ~/.gitconfig includes this for repos under ~/src/suse
+# and ~/src/suse-tmm (see the [includeIf] blocks there). Change the identity
+# via `chezmoi init` (workName / workEmail prompts).
+[user]
+	name = {{ .workName }}
+	email = {{ .workEmail }}
+
+# Commit signing — uncomment and fill in if work requires it.
+#   SSH signing:
+# 	signingKey = ~/.ssh/id_ed25519.pub
+# [gpg]
+# 	format = ssh
+# [commit]
+# 	gpgSign = true
+{{ end -}}

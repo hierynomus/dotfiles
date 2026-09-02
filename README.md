@@ -79,9 +79,11 @@ chezmoi apply             # or -v to preview the diff first
   `bat` and `ripgrep` (the latter via `$RIPGREP_CONFIG_PATH`, set in
   `.zshenv`). Both tools, plus `eza`, `fd` and `zoxide`, are installed by
   mise; `.zshrc` wires up `zoxide` (`z <dir>`).
-- `dot_gitconfig.tmpl` — your git identity and aliases (`st`, `up`, `lg`,
-  `lg2`, `ribbon`, `catchup`, etc.), unchanged except for what's listed
-  below.
+- `dot_gitconfig.tmpl` — git identity, sane defaults, and aliases (`st`,
+  `up`, `lg`, `lg2`, `ribbon`, `catchup`, etc.). See the git notes below.
+- `dot_config/git/work.tmpl` — `[user]` override for `~/src/suse` /
+  `~/src/suse-tmm`, pulled in by `[includeIf]` in `~/.gitconfig`. Only
+  created when a `workEmail` was given at `chezmoi init`.
 - `dot_tmux.conf.tmpl` + `dot_tmux/` — tmux config and the two helper
   scripts (`yank.sh`, `renew_env.sh`) it calls out to.
 - `dot_config/ghostty/config.tmpl` — Ghostty terminal config. Same file
@@ -194,8 +196,16 @@ value you give `chezmoi init`, same as `$EDITOR`; added `pull.rebase` and
 `credential.helper` (osxkeychain on macOS, cache on Linux) since those
 weren't set before. The `gu` shell alias no longer needs the
 pip-installed [`git-up`](https://github.com/aanand/git-up) — it's now a
-plain `git up` alias (`pull --rebase --autostash`), which drops the only
-reason the bootstrap script touched pip/pipx at all.
+plain `git up` alias (`pull --rebase`), which drops the only reason the
+bootstrap script touched pip/pipx at all.
+
+Also added: `rebase.autoStash`, `fetch.prune`, `rerere.enabled`,
+`merge.conflictStyle = zdiff3`, `diff.algorithm = histogram`, and
+[delta](https://github.com/dandavison/delta) as the pager (only when
+`delta` is installed — it's in the global mise config). Repos under
+`~/src/suse` and `~/src/suse-tmm` pick up a separate work identity via
+`[includeIf]` → `~/.config/git/work`, filled from the `workName` /
+`workEmail` prompts (blank = personal identity everywhere).
 
 **VS Code**: settings/keybindings otherwise untouched. Only functional
 change: `vs-kubernetes`'s tool paths were hardcoded to one Mac's home

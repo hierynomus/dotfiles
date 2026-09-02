@@ -30,8 +30,8 @@ git_prune_branch() {
   done
 }
 
-# `git up` (pull --rebase --autostash) every git repo found one level down
-# from the cwd.
+# `git up` (pull --rebase, autostash on) every git repo found one level
+# down from the cwd.
 git_pull_all() {
   local i r
   for i in $(find . -name ".git" -type d -depth 2); do

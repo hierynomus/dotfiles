@@ -21,6 +21,11 @@ Library
 .config/Code
 {{ end -}}
 
+{{/* No work identity configured -> don't create ~/.config/git/work. */}}
+{{ if not .workEmail -}}
+.config/git/work
+{{ end -}}
+
 {{/* Headless machines get the shell/CLI setup only — no GUI config. */}}
 {{ if not .gui -}}
 .config/ghostty
