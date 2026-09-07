@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Installs the VS Code extensions the settings in this repo assume are
+# present (currently just the Catppuccin theme used by
+# workbench.colorTheme). Re-runs whenever this list changes.
+set -euo pipefail
+
+{{ if not .gui -}}
+exit 0
+{{ end -}}
+
+extensions=(catppuccin.catppuccin-vsc)
+
+CODE="$(command -v code || true)"
+if [ -z "$CODE" ]; then
+  echo "NOTE: 'code' CLI not found on PATH — skipping VS Code extension install."
+  echo "      Install VS Code, then re-run 'chezmoi apply' to pick this up."
+  exit 0
+fi
+
+installed="$("$CODE" --list-extensions)"
+for ext in "${extensions[@]}"; do
+  if ! grep -qi "^${ext}$" <<< "$installed"; then
+    echo "==> Installing VS Code extension: $ext"
+    "$CODE" --install-extension "$ext"
+  fi
+done
