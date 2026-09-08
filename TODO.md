@@ -57,17 +57,29 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       prompt otherwise. Capped at 3 runtimes ("+N" for the rest) — it got
       unwieldy fast on a polyglot project.
 - [x] **Starship as an alternate prompt backend** — `dot_config/starship.toml`
-      + `dot_config/starship/mise-prompt.sh` (bash port of `prompt_mise`,
-      same runtime filter and 3-entry cap). `prompt-backend {p10k,starship}` (in
-      `dot_config/zsh/functions.zsh`) switches by writing
-      `~/.config/zsh/prompt-backend` and `exec zsh`; `.zshrc` reads it to
-      decide whether to run the p10k instant-prompt block / source
-      `~/.p10k.zsh`, or `eval "$(starship init zsh)"`. Separate antidote
-      plugin list (`.zsh_plugins-starship.txt`, no powerlevel10k) and cached
-      bundle so toggling never rebuilds the other backend's. `starship`
-      added to the global mise config. Powerlevel10k stays the default —
-      it's on maintainer-declared "life support" but still works fine;
-      starship is there to try, not a forced migration.
+      + `dot_config/starship/mise-prompt.sh` (bash port of `prompt_mise`).
+      `prompt-backend {p10k,starship}` (in `dot_config/zsh/functions.zsh`)
+      switches by writing `~/.config/zsh/prompt-backend` and `exec zsh`;
+      `.zshrc` reads it to decide whether to run the p10k instant-prompt
+      block / source `~/.p10k.zsh`, or `eval "$(starship init zsh)"`.
+      Separate antidote plugin list (`.zsh_plugins-starship.txt`, no
+      powerlevel10k) and cached bundle so toggling never rebuilds the other
+      backend's. `starship` added to the global mise config. Powerlevel10k
+      stays the default — it's on maintainer-declared "life support" but
+      still works fine; starship is there to try, not a forced migration.
+- [x] **Starship theme: catppuccin-powerline** — `dot_config/starship.toml`
+      is starship's built-in `catppuccin-powerline` preset (Mocha flavor,
+      matching Ghostty/VS Code), with extra powerline segments spliced in
+      for the mise runtimes the preset's own language modules don't cover,
+      kubernetes/terraform/aws/azure/gcloud/nix_shell, and jobs/status
+      (mauve and pink, unused by the preset itself). The mise segment is
+      further narrowed to runtimes not already shown natively (node/python/
+      go/rust/java/bun are the preset's own modules) so nothing double-
+      counts. Found and fixed a starship quirk along the way: a custom
+      module with both `when` and `command` set still renders a bare
+      `$symbol` once `when` passes even if `command` then exits non-zero —
+      `mise-prompt.sh --check`/the real run now share the exact same
+      relevance grep so they can't disagree.
 
 - [x] **git config** — `rebase.autoStash`, `fetch.prune`, `rerere.enabled`,
       `merge.conflictStyle=zdiff3`, `diff.algorithm=histogram`, and `delta`

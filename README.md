@@ -75,10 +75,14 @@ chezmoi apply             # or -v to preview the diff first
   replaced with a custom `mise` segment (`prompt_mise`) that shows the
   language runtimes a project-local mise config pins.
 - `dot_config/starship.toml` + `dot_config/starship/mise-prompt.sh` —
-  starship config, the alternate prompt (see "Prompt backend" below). The
-  `custom.mise` module calls `mise-prompt.sh`, a bash port of `prompt_mise`
-  capped at 3 runtimes (`+N` for the rest) so a project pinning half a dozen
-  doesn't take over the line.
+  starship config, the alternate prompt (see "Prompt backend" below). Based
+  on starship's built-in `catppuccin-powerline` preset (Mocha flavor, same
+  as Ghostty/VS Code) with extra powerline segments spliced in: mise-pinned
+  runtimes the preset's language modules don't cover, kubernetes/cloud
+  context, jobs/exit status. The `custom.mise` module calls
+  `mise-prompt.sh`, a bash port of `prompt_mise` capped at 3 runtimes
+  (`+N` for the rest) so a project pinning half a dozen doesn't take over
+  the line.
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
   readability and sourced from it automatically. `aliases.zsh` points
@@ -163,7 +167,18 @@ runtimes (`mise plugins ls --core`: node, python, go, rust, ruby, java,
 bun, …) — filtering out CLI tools that happen to be mise-managed too
 (`uv`, `terraform`, `awscli`, …). That runtime list is hardcoded in both
 places rather than shelled out to on every prompt; update it there if mise
-adds a new core plugin you use.
+adds a new core plugin you use. On the starship side the segment further
+narrows to runtimes the preset's own language modules (node, python, go,
+rust, java, bun) don't already show, so a project pinning node doesn't
+show its version twice.
+
+`mise-prompt.sh` is wired as both `when` and `command` for starship's
+`custom.mise` module, and deliberately shares the exact same relevance
+check between the two (a cheap grep for a wanted runtime name in the
+config file, before ever calling `mise`) — a custom module with `when` and
+`command` both set still renders a bare icon once `when` passes even if
+`command` then finds nothing to report, so keeping them in lockstep avoids
+that.
 
 ## Secrets
 
