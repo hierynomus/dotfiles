@@ -27,6 +27,7 @@ fd = "latest"
 ripgrep = "latest"
 delta = "latest"          # git pager — ~/.gitconfig enables it when present
 starship = "latest"       # alternate prompt to powerlevel10k — `prompt-backend starship`
+go = "1.26.2"             # pinned (not "latest") — bump deliberately with `mise use -g go@<ver>`
 
 [settings]
 gpg_verify = false
