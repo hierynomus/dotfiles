@@ -1768,8 +1768,10 @@
   ##########################[ mise: active tool versions (custom) ]##########################
   # Powerlevel10k has no built-in mise segment, so this replaces the removed
   # asdf/pyenv/nodenv/... segments. It shows `name version` pairs for the
-  # tools a *project-local* mise config pins (mise.toml, .tool-versions, …),
-  # capped at 3 with a "+N" suffix for the rest, and stays hidden in $HOME
+  # *language runtimes* a project-local mise config pins (mise.toml,
+  # .tool-versions, …) — mise's own "core" plugins (`mise plugins ls --core`),
+  # not CLI tools like uv/terraform/awscli that also happen to be mise-managed
+  # — capped at 3 with a "+N" suffix for the rest, and stays hidden in $HOME
   # and global-only directories.
   #
   # Cost: a few stat() calls per prompt. `mise` itself is only run when the
@@ -1795,20 +1797,27 @@
     local key=$cfg$'\1'$st[1]
     if [[ ${_prompt_mise_key-} != $key ]]; then
       typeset -g _prompt_mise_key=$key _prompt_mise_text=
-      local line
+      local line name
       local -a p pairs
+      # mise's core plugins — actual language runtimes, as opposed to the
+      # CLI tools (terraform, awscli, uv, …) mise also happens to manage.
+      # Static rather than shelling out to `mise plugins ls --core` every
+      # prompt; check that list if a new runtime doesn't show up here.
+      local -a runtimes=(bun deno dotnet elixir erlang go java node python ruby rust swift zig)
       # MISE_OFFLINE keeps this from ever blocking the prompt on a network
       # call to resolve "latest"; --no-header for older mise safety.
       while IFS= read -r line; do
         p=(${(z)line})
         (( $#p >= 2 )) || continue
         [[ $p[1] == Tool && $p[2] == Version ]] && continue
-        pairs+=("${p[1]##*:} ${p[2]}")
+        name=${p[1]##*:}
+        (( ${runtimes[(Ie)$name]} )) || continue
+        pairs+=("$name ${p[2]}")
       done < <(MISE_OFFLINE=1 command mise ls --local --no-header 2>/dev/null)
 
-      # Capped at 3 tools ("+N" for the rest) — otherwise a project pinning
-      # half a dozen tools takes over the whole prompt line. Same cap as
-      # the starship equivalent (dot_config/starship/mise-prompt.sh).
+      # Capped at 3 runtimes ("+N" for the rest) — otherwise a polyglot
+      # project takes over the whole prompt line. Same cap as the starship
+      # equivalent (dot_config/starship/mise-prompt.sh).
       local max=3
       if (( $#pairs > max )); then
         _prompt_mise_text="${(j: :)pairs[1,max]} +$(( $#pairs - max ))"

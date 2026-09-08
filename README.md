@@ -73,11 +73,11 @@ chezmoi apply             # or -v to preview the diff first
 - `dot_p10k.zsh` — powerlevel10k config, carried over from dotmac. Only
   change: the built-in language version-manager segments were dropped and
   replaced with a custom `mise` segment (`prompt_mise`) that shows the
-  tool versions a project-local mise config pins.
+  language runtimes a project-local mise config pins.
 - `dot_config/starship.toml` + `dot_config/starship/mise-prompt.sh` —
   starship config, the alternate prompt (see "Prompt backend" below). The
   `custom.mise` module calls `mise-prompt.sh`, a bash port of `prompt_mise`
-  capped at 3 tools (`+N` for the rest) so a project pinning half a dozen
+  capped at 3 runtimes (`+N` for the rest) so a project pinning half a dozen
   doesn't take over the line.
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
@@ -156,10 +156,14 @@ installed via mise like the other modern CLI tools; if it's missing,
 `.zshrc` falls back to a plain prompt and prints a note.
 
 The `mise` prompt segment is a straight port either way — same "walk up
-from cwd, run `mise ls --local`" logic — but the starship version
-(`dot_config/starship/mise-prompt.sh`) caps display at 3 tools with a
-`+N` suffix for the rest, since the p10k segment gets unwieldy fast once a
-project pins more than a couple.
+from cwd, run `mise ls --local`" logic — capped at 3 entries with a `+N`
+suffix for the rest, since it gets unwieldy fast once a project pins more
+than a couple. It also only shows mise's "core" plugins — actual language
+runtimes (`mise plugins ls --core`: node, python, go, rust, ruby, java,
+bun, …) — filtering out CLI tools that happen to be mise-managed too
+(`uv`, `terraform`, `awscli`, …). That runtime list is hardcoded in both
+places rather than shelled out to on every prompt; update it there if mise
+adds a new core plugin you use.
 
 ## Secrets
 

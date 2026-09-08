@@ -48,14 +48,17 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       bootstrap scripts across every machine-type branch.
 - [x] **Custom p10k `mise` segment** — `prompt_mise` in `dot_p10k.zsh`
       (added to `RIGHT_PROMPT_ELEMENTS`). Shows `name version` pairs from
-      `mise ls --local` for the tools a project-local config pins; hidden
-      in `$HOME` / global-only dirs. Runs `mise` (with `MISE_OFFLINE=1`)
-      only when the nearest local config's mtime changes; a few `stat()`s
-      per prompt otherwise. Capped at 3 tools ("+N" for the rest) — it got
-      unwieldy fast on a project pinning more than a couple.
+      `mise ls --local` for the *language runtimes* a project-local config
+      pins — mise's "core" plugins (`mise plugins ls --core`, hardcoded
+      locally rather than shelled out to), filtering out CLI tools that
+      happen to be mise-managed too (`uv`, `terraform`, …); hidden in
+      `$HOME` / global-only dirs. Runs `mise` (with `MISE_OFFLINE=1`) only
+      when the nearest local config's mtime changes; a few `stat()`s per
+      prompt otherwise. Capped at 3 runtimes ("+N" for the rest) — it got
+      unwieldy fast on a polyglot project.
 - [x] **Starship as an alternate prompt backend** — `dot_config/starship.toml`
       + `dot_config/starship/mise-prompt.sh` (bash port of `prompt_mise`,
-      same 3-tool cap). `prompt-backend {p10k,starship}` (in
+      same runtime filter and 3-entry cap). `prompt-backend {p10k,starship}` (in
       `dot_config/zsh/functions.zsh`) switches by writing
       `~/.config/zsh/prompt-backend` and `exec zsh`; `.zshrc` reads it to
       decide whether to run the p10k instant-prompt block / source
