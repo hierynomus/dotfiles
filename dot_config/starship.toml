@@ -18,15 +18,15 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](red)\
+[](red)\
 $os\
 $username\
-[](bg:peach fg:red)\
+[](bg:peach fg:red)\
 $directory\
-[](bg:yellow fg:peach)\
+[](bg:yellow fg:peach)\
 $git_branch\
 $git_status\
-[](fg:yellow bg:green)\
+[](fg:yellow bg:green)\
 $c\
 $rust\
 $golang\
@@ -38,21 +38,21 @@ $kotlin\
 $haskell\
 $python\
 ${custom.mise}\
-[](fg:green bg:mauve)\
+[](fg:green bg:mauve)\
 $kubernetes\
 $terraform\
 $aws\
 $azure\
 $gcloud\
 $nix_shell\
-[](fg:mauve bg:pink)\
+[](fg:mauve bg:pink)\
 $jobs\
 $status\
-[](fg:pink bg:sapphire)\
+[](fg:pink bg:sapphire)\
 $conda\
-[](fg:sapphire bg:lavender)\
+[](fg:sapphire bg:lavender)\
 $time\
-[ ](fg:lavender)\
+[ ](fg:lavender)\
 $cmd_duration\
 $line_break\
 $character"""
