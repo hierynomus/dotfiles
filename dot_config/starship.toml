@@ -67,6 +67,13 @@ style = "bg:red fg:crust"
 Windows = ""
 Ubuntu = "󰕈"
 SUSE = ""
+# The preset only maps "SUSE", but the os_info crate starship uses actually
+# reports "openSUSE" for openSUSE boxes -- that key never matched, so it
+# silently fell through to starship's own built-in default: a literal lizard
+# emoji, which is formally double-width and was corrupting the line on every
+# redraw (history recall, completion, resize) since it's the OS icon and
+# shows on every single prompt. Not just cosmetic.
+openSUSE = ""
 Raspbian = "󰐿"
 Mint = "󰣭"
 Macos = "󰀵"
@@ -190,16 +197,32 @@ style = "fg:crust bg:sapphire"
 format = '[$symbol$environment ]($style)'
 ignore_base = false
 
+# kubernetes/terraform/aws/gcloud/nix_shell/jobs/status below all override
+# starship's default `symbol` — those defaults are genuine emoji (aws/gcloud
+# "☁️", nix_shell "❄️", terraform "💠", status "❌", all either forced into
+# emoji presentation by a trailing U+FE0F or formally double-width Unicode
+# to begin with) or, for kubernetes/jobs, plain Unicode symbols this font
+# doesn't ship at all so the terminal silently falls back to a different
+# font for just that glyph. Either way the terminal renders them wider than
+# zsh's own width calculation expects, and that mismatch is what corrupts
+# the line on every redraw (history recall, tab completion, resize) — not
+# a font bug, the prompt content itself. Replaced with narrow single-width
+# Nerd Font icons instead — verified present in SUSEMono Nerd Font (the
+# font Ghostty/VS Code actually use) before picking each one; azure's own
+# default was already a proper narrow nerd-font glyph, so it's untouched.
 [kubernetes]
 disabled = false
+symbol = " "
 style = "bg:mauve"
 format = '[[ $symbol$context ](fg:crust bg:mauve)]($style)'
 
 [terraform]
+symbol = " "
 style = "bg:mauve"
 format = '[[ $symbol$workspace ](fg:crust bg:mauve)]($style)'
 
 [aws]
+symbol = "  "
 style = "bg:mauve"
 format = '[[ $symbol$profile ](fg:crust bg:mauve)]($style)'
 
@@ -208,19 +231,23 @@ style = "bg:mauve"
 format = '[[ $symbol$subscription ](fg:crust bg:mauve)]($style)'
 
 [gcloud]
+symbol = "󱇶  "
 style = "bg:mauve"
 format = '[[ $symbol$account ](fg:crust bg:mauve)]($style)'
 
 [nix_shell]
+symbol = "  "
 style = "bg:mauve"
 format = '[[ $symbol$state ](fg:crust bg:mauve)]($style)'
 
 [jobs]
+symbol = ""
 style = "bg:pink"
 format = '[[ $symbol$number ](fg:crust bg:pink)]($style)'
 
 [status]
 disabled = false
+symbol = ""
 style = "bg:pink"
 format = '[[ $symbol$status ](fg:crust bg:pink)]($style)'
 
