@@ -39,6 +39,25 @@ if [[ ! "$zsh_plugins" -nt "$zsh_plugins_txt" ]]; then
 fi
 source "$zsh_plugins"
 
+# Completion system. Nothing above actually calls this: `ohmyzsh/ohmyzsh
+# path:lib` only pulls in the lib/ scripts (zstyle setup, bashcompinit) —
+# the real `compinit` call lives in oh-my-zsh.sh itself, which we
+# deliberately don't source, and neither prompt backend calls it either.
+# Anything below that registers completions via `compdef` (kubectl, mise,
+# gcloud, scmpuff) needs this to have already run, or it fails with
+# "command not found: compdef". Cached like oh-my-zsh/p10k do it: skip
+# compaudit's security check (-C) if the dump is less than a day old.
+autoload -Uz compinit
+_zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+_zcompdump_fresh=("$_zcompdump"(Nmh-24))
+if (( $#_zcompdump_fresh )); then
+  # Dump is less than a day old — skip compaudit's directory-permission scan.
+  compinit -C -d "$_zcompdump"
+else
+  compinit -d "$_zcompdump"
+fi
+unset _zcompdump _zcompdump_fresh
+
 if [[ $PROMPT_BACKEND == p10k ]]; then
   # To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh.
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
