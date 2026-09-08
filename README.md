@@ -1,9 +1,12 @@
 # dotfiles
 
 Managed with [chezmoi](https://www.chezmoi.io/), zsh managed with
-[antidote](https://getantidote.github.io/) + [powerlevel10k](https://github.com/romkatv/powerlevel10k).
-Works the same on macOS and Linux — OS differences are handled with chezmoi
-templates rather than by hand.
+[antidote](https://getantidote.github.io/). The prompt is
+[powerlevel10k](https://github.com/romkatv/powerlevel10k) by default, with
+[starship](https://starship.rs/) available as a drop-in alternative — run
+`prompt-backend starship` to try it, `prompt-backend p10k` to go back (see
+"Prompt backend" below). Works the same on macOS and Linux — OS differences
+are handled with chezmoi templates rather than by hand.
 
 Rebuilt from [hierynomus/dotmac](https://github.com/hierynomus/dotmac); see
 "What changed from dotmac" below for what moved, what got fixed, and what
@@ -71,6 +74,11 @@ chezmoi apply             # or -v to preview the diff first
   change: the built-in language version-manager segments were dropped and
   replaced with a custom `mise` segment (`prompt_mise`) that shows the
   tool versions a project-local mise config pins.
+- `dot_config/starship.toml` + `dot_config/starship/mise-prompt.sh` —
+  starship config, the alternate prompt (see "Prompt backend" below). The
+  `custom.mise` module calls `mise-prompt.sh`, a bash port of `prompt_mise`
+  capped at 3 tools (`+N` for the rest) so a project pinning half a dozen
+  doesn't take over the line.
 - `dot_config/zsh/` — aliases, the kubectl/kubeconfig helpers, bind keys,
   and general-purpose shell functions, split out of `.zshrc` for
   readability and sourced from it automatically. `aliases.zsh` points
@@ -126,6 +134,32 @@ chezmoi apply             # or -v to preview the diff first
   - `run_onchange_after_20-mise-install.sh.tmpl` runs `mise install` for
     everything in the global mise config; re-runs when that config
     changes.
+
+## Prompt backend
+
+Two prompts are wired up: powerlevel10k (`dot_p10k.zsh`, the default) and
+starship (`dot_config/starship.toml`). `.zshrc` picks one at shell start by
+reading `~/.config/zsh/prompt-backend` — a plain per-machine state file,
+not chezmoi-managed, defaulting to `p10k` when absent.
+
+```
+prompt-backend            # print the current backend
+prompt-backend starship   # switch and exec a new shell
+prompt-backend p10k       # switch back
+```
+
+Each backend has its own antidote plugin list (`.zsh_plugins.txt` vs
+`.zsh_plugins-starship.txt` — the latter is the former minus
+`romkatv/powerlevel10k`) and its own cached bundle file, so toggling back
+and forth never forces a rebuild of the other one's cache. `starship` is
+installed via mise like the other modern CLI tools; if it's missing,
+`.zshrc` falls back to a plain prompt and prints a note.
+
+The `mise` prompt segment is a straight port either way — same "walk up
+from cwd, run `mise ls --local`" logic — but the starship version
+(`dot_config/starship/mise-prompt.sh`) caps display at 3 tools with a
+`+N` suffix for the rest, since the p10k segment gets unwieldy fast once a
+project pins more than a couple.
 
 ## Secrets
 

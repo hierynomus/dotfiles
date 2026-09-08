@@ -58,6 +58,25 @@ git_prune_all() {
   done
 }
 
+# Switch between the p10k and starship prompts without editing dotfiles.
+# No args: print the current backend. `prompt-backend starship` (or `p10k`):
+# write the choice to the state file .zshrc reads at startup, then exec a
+# new shell so it takes effect immediately.
+prompt-backend() {
+  local state_file="${ZDOTDIR:-$HOME}/.config/zsh/prompt-backend"
+  if [[ $# -eq 0 ]]; then
+    echo "${PROMPT_BACKEND:-p10k}"
+    return 0
+  fi
+  case "$1" in
+    p10k|starship) ;;
+    *) echo "usage: prompt-backend [p10k|starship]" >&2; return 1 ;;
+  esac
+  echo "$1" > "$state_file"
+  echo "Switched to $1 — starting a new shell..."
+  exec zsh
+}
+
 # Activate the nearest parent virtualenv (walks up from cwd looking for a
 # `.Python` marker file).
 venv() {

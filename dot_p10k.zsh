@@ -1768,8 +1768,9 @@
   ##########################[ mise: active tool versions (custom) ]##########################
   # Powerlevel10k has no built-in mise segment, so this replaces the removed
   # asdf/pyenv/nodenv/... segments. It shows `name version` pairs for the
-  # tools a *project-local* mise config pins (mise.toml, .tool-versions, …)
-  # and stays hidden in $HOME and global-only directories.
+  # tools a *project-local* mise config pins (mise.toml, .tool-versions, …),
+  # capped at 3 with a "+N" suffix for the rest, and stays hidden in $HOME
+  # and global-only directories.
   #
   # Cost: a few stat() calls per prompt. `mise` itself is only run when the
   # nearest local config's mtime changes — so if you edit a config in place
@@ -1795,15 +1796,25 @@
     if [[ ${_prompt_mise_key-} != $key ]]; then
       typeset -g _prompt_mise_key=$key _prompt_mise_text=
       local line
-      local -a p
+      local -a p pairs
       # MISE_OFFLINE keeps this from ever blocking the prompt on a network
       # call to resolve "latest"; --no-header for older mise safety.
       while IFS= read -r line; do
         p=(${(z)line})
         (( $#p >= 2 )) || continue
         [[ $p[1] == Tool && $p[2] == Version ]] && continue
-        _prompt_mise_text+="${_prompt_mise_text:+ }${p[1]##*:} ${p[2]}"
+        pairs+=("${p[1]##*:} ${p[2]}")
       done < <(MISE_OFFLINE=1 command mise ls --local --no-header 2>/dev/null)
+
+      # Capped at 3 tools ("+N" for the rest) — otherwise a project pinning
+      # half a dozen tools takes over the whole prompt line. Same cap as
+      # the starship equivalent (dot_config/starship/mise-prompt.sh).
+      local max=3
+      if (( $#pairs > max )); then
+        _prompt_mise_text="${(j: :)pairs[1,max]} +$(( $#pairs - max ))"
+      else
+        _prompt_mise_text="${(j: :)pairs}"
+      fi
     fi
 
     [[ -n $_prompt_mise_text ]] || return

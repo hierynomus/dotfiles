@@ -26,6 +26,7 @@ bat = "latest"
 fd = "latest"
 ripgrep = "latest"
 delta = "latest"          # git pager — ~/.gitconfig enables it when present
+starship = "latest"       # alternate prompt to powerlevel10k — `prompt-backend starship`
 
 [settings]
 gpg_verify = false

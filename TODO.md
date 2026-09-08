@@ -51,7 +51,20 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       `mise ls --local` for the tools a project-local config pins; hidden
       in `$HOME` / global-only dirs. Runs `mise` (with `MISE_OFFLINE=1`)
       only when the nearest local config's mtime changes; a few `stat()`s
-      per prompt otherwise.
+      per prompt otherwise. Capped at 3 tools ("+N" for the rest) — it got
+      unwieldy fast on a project pinning more than a couple.
+- [x] **Starship as an alternate prompt backend** — `dot_config/starship.toml`
+      + `dot_config/starship/mise-prompt.sh` (bash port of `prompt_mise`,
+      same 3-tool cap). `prompt-backend {p10k,starship}` (in
+      `dot_config/zsh/functions.zsh`) switches by writing
+      `~/.config/zsh/prompt-backend` and `exec zsh`; `.zshrc` reads it to
+      decide whether to run the p10k instant-prompt block / source
+      `~/.p10k.zsh`, or `eval "$(starship init zsh)"`. Separate antidote
+      plugin list (`.zsh_plugins-starship.txt`, no powerlevel10k) and cached
+      bundle so toggling never rebuilds the other backend's. `starship`
+      added to the global mise config. Powerlevel10k stays the default —
+      it's on maintainer-declared "life support" but still works fine;
+      starship is there to try, not a forced migration.
 
 - [x] **git config** — `rebase.autoStash`, `fetch.prune`, `rerere.enabled`,
       `merge.conflictStyle=zdiff3`, `diff.algorithm=histogram`, and `delta`
@@ -59,6 +72,12 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
       config). `up` alias simplified to `pull --rebase`. Separate work
       identity for `~/src/suse` + `~/src/suse-tmm` via `[includeIf]` →
       `~/.config/git/work`, from the `workName`/`workEmail` init prompts.
+
+- [x] **VS Code extensions** — Ghostty and VS Code switched to Catppuccin
+      Mocha (`dot_config/ghostty/config.tmpl`, both `settings.json.tmpl`).
+      `run_onchange_after_15-install-vscode-extensions.sh.tmpl` installs
+      `catppuccin.catppuccin-vsc` via `code --install-extension` on GUI
+      machines; no-ops (with a note) if `code` isn't on PATH yet.
 
 ## Next (recommended)
 
@@ -71,8 +90,6 @@ Improvement backlog. `.chezmoiignore` keeps this file out of `$HOME`.
 - [ ] macOS `defaults` script (`run_onchange_darwin-*.sh.tmpl`) — Dock,
       Finder, key-repeat, screenshot location.
 - [ ] Linux GNOME `dconf` / `gsettings` script (or document the manual steps).
-- [ ] VS Code extensions — checked-in list installed by a `run_onchange_`
-      script (`code --install-extension`).
 - [ ] `zcompile` the `dot_config/zsh/*.zsh` files / cache the compinit dump
       for faster shell startup.
 - [ ] Small niceties: `dot_hushlogin`, `dot_editorconfig`.

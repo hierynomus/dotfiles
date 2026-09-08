@@ -1,16 +1,29 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of
-# ~/.zshrc. Anything that reads input (password prompts, [y/n]) must go
-# above this block; everything else goes below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# Prompt backend: "p10k" (default) or "starship". Toggle with the
+# `prompt-backend` function (dot_config/zsh/functions.zsh) — it writes this
+# state file and execs a new shell. Nothing here is chezmoi-managed; it's a
+# plain per-machine preference file, absent until you switch at least once.
+PROMPT_BACKEND=p10k
+if [[ -r "${ZDOTDIR:-$HOME}/.config/zsh/prompt-backend" ]]; then
+  PROMPT_BACKEND=$(<"${ZDOTDIR:-$HOME}/.config/zsh/prompt-backend")
+fi
+
+if [[ $PROMPT_BACKEND == p10k ]]; then
+  # Enable Powerlevel10k instant prompt. Should stay close to the top of
+  # ~/.zshrc. Anything that reads input (password prompts, [y/n]) must go
+  # above this block; everything else goes below.
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  fi
 fi
 
 #
 # antidote — plugin manager. Loads the static bundle if it's up to date,
-# rebuilds it if .zsh_plugins.txt changed since the last shell start.
+# rebuilds it if the plugin list changed since the last shell start.
 # ~/.antidote itself is cloned/updated by chezmoi (.chezmoiexternal.toml);
 # the clone below is only a fallback for a shell started before the first
-# `chezmoi apply` has run.
+# `chezmoi apply` has run. The starship backend uses a separate plugin list
+# (no powerlevel10k) with its own cached bundle, so switching backends never
+# needs a rebuild of the other one's cache.
 #
 ANTIDOTE_HOME="${ZDOTDIR:-$HOME}/.antidote"
 if [[ ! -d "$ANTIDOTE_HOME" ]]; then
@@ -18,15 +31,23 @@ if [[ ! -d "$ANTIDOTE_HOME" ]]; then
 fi
 source "$ANTIDOTE_HOME/antidote.zsh"
 
-zsh_plugins="${ZDOTDIR:-$HOME}/.zsh_plugins.zsh"
 zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins.txt"
+[[ $PROMPT_BACKEND == starship ]] && zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins-starship.txt"
+zsh_plugins="${zsh_plugins_txt%.txt}.zsh"
 if [[ ! "$zsh_plugins" -nt "$zsh_plugins_txt" ]]; then
   antidote bundle < "$zsh_plugins_txt" > "$zsh_plugins"
 fi
 source "$zsh_plugins"
 
-# To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+if [[ $PROMPT_BACKEND == p10k ]]; then
+  # To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh.
+  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+elif (( $+commands[starship] )); then
+  # Config: dot_config/starship.toml -> ~/.config/starship.toml.
+  eval "$(starship init zsh)"
+else
+  echo "prompt-backend: starship selected but not installed (mise install starship)" >&2
+fi
 
 #
 # Shell config split out for readability — see dot_config/zsh/ in the

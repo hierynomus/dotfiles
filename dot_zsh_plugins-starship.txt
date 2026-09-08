@@ -1,0 +1,20 @@
+# antidote bundle file for the starship prompt backend (see PROMPT_BACKEND
+# in .zshrc / `prompt-backend`) — same as .zsh_plugins.txt minus
+# powerlevel10k, which starship replaces. Keep the two lists in sync
+# otherwise.
+# See: https://getantidote.github.io/
+
+# Useful oh-my-zsh library functions (just the lib, not the whole framework)
+ohmyzsh/ohmyzsh path:lib
+
+# Completion definitions beyond zsh's built-ins
+zsh-users/zsh-completions kind:fpath
+
+# Fish-style "as you type" suggestions from history
+zsh-users/zsh-autosuggestions
+
+# Up/down arrow searches history matching what you've typed so far
+zsh-users/zsh-history-substring-search
+
+# Must load last: highlights commands as valid/invalid while you type
+zsh-users/zsh-syntax-highlighting kind:defer

@@ -1,0 +1,110 @@
+# Starship config — an alternate to Powerlevel10k (dot_p10k.zsh). Switch
+# between them with the `prompt-backend` shell function
+# (dot_config/zsh/functions.zsh); PROMPT_BACKEND in .zshrc reads the choice
+# back on the next shell. Roughly mirrors the p10k layout: left prompt is
+# os/dir/git, right prompt is everything else — status, duration, cloud
+# contexts, the mise segment, clock.
+#
+# https://starship.rs/config/
+
+add_newline = false
+
+format = """
+$os\
+$directory\
+$git_branch\
+$git_status\
+$character"""
+
+right_format = """
+$status\
+$cmd_duration\
+$jobs\
+$python\
+${custom.mise}\
+$kubernetes\
+$terraform\
+$aws\
+$azure\
+$gcloud\
+$nix_shell\
+$username\
+$hostname\
+$time"""
+
+[os]
+disabled = false
+style = "bold white"
+
+[os.symbols]
+Linux = " "
+Macos = " "
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
+
+[status]
+disabled = false
+format = "[$symbol$status]($style) "
+
+[cmd_duration]
+min_time = 500
+format = "[$duration]($style) "
+
+[jobs]
+symbol = "✦ "
+
+[python]
+format = "[$virtualenv]($style) "
+
+# Project-local mise tool versions — the equivalent of the old p10k
+# `prompt_mise` segment (dot_p10k.zsh). `when` is the cheap directory-walk
+# check; `command` (only run if `when` passes) does the actual `mise ls` and
+# caps the output at 3 tools so a project pinning half a dozen doesn't take
+# over the line. See dot_config/starship/mise-prompt.sh.
+[custom.mise]
+description = "Project-local mise tool versions, capped at 3"
+when = "$HOME/.config/starship/mise-prompt.sh --check"
+command = "$HOME/.config/starship/mise-prompt.sh"
+shell = ["bash", "--noprofile", "--norc"]
+symbol = " "
+format = "[$symbol$output]($style) "
+style = "bold yellow"
+
+[kubernetes]
+disabled = false
+format = "[$symbol$context]($style) "
+
+[terraform]
+format = "[$symbol$workspace]($style) "
+
+[aws]
+format = "[$symbol$profile]($style) "
+
+[azure]
+format = "[$symbol$subscription]($style) "
+
+[gcloud]
+format = "[$symbol$account]($style) "
+
+[nix_shell]
+format = "[$symbol$state]($style) "
+
+[username]
+show_always = false
+
+[hostname]
+ssh_only = true
+
+[time]
+disabled = false
+format = "[$time]($style) "
