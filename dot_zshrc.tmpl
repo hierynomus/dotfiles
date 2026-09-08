@@ -31,6 +31,18 @@ if [[ ! -d "$ANTIDOTE_HOME" ]]; then
 fi
 source "$ANTIDOTE_HOME/antidote.zsh"
 
+# A stub `compdef` so the bundle below can call it safely before compinit
+# has defined the real one — oh-my-zsh's lib/directories.zsh does exactly
+# that (`compdef _dirs d`) as soon as it's sourced, not from inside a
+# function, so no amount of reordering the plugin list fixes it: the whole
+# bundle is one file, sourced in one shot. Queue calls made against the
+# stub and replay them once the real compdef exists below. Same pattern
+# grml/prezto use for this.
+_compdef_deferred=()
+if ! (( $+functions[compdef] )); then
+  compdef() { _compdef_deferred+=("$*") }
+fi
+
 zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins.txt"
 [[ $PROMPT_BACKEND == starship ]] && zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins-starship.txt"
 zsh_plugins="${zsh_plugins_txt%.txt}.zsh"
@@ -57,6 +69,22 @@ else
   compinit -d "$_zcompdump"
 fi
 unset _zcompdump _zcompdump_fresh
+
+# Replay whatever the stub above caught (real compdef, from compinit, is
+# now in place) — same effect as if compinit had run before the bundle.
+# `$#_compdef_deferred` (not `${#_compdef_deferred[@]:-0}`) matters here:
+# on a box where compdef already existed (see comment above the stub) the
+# array is legitimately empty rather than unset, and in zsh `${x[@]}` on a
+# never-declared variable counts as *one* empty-string element, not zero —
+# that footgun is exactly what caused a real "compdef: I need arguments"
+# below when this was `${#_compdef_deferred[@]:-0}`.
+if (( $#_compdef_deferred )); then
+  for _cd in "${_compdef_deferred[@]}"; do
+    compdef ${(z)_cd}
+  done
+  unset _cd
+fi
+unset _compdef_deferred
 
 if [[ $PROMPT_BACKEND == p10k ]]; then
   # To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh.
