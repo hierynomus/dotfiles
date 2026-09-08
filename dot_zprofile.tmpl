@@ -16,6 +16,25 @@ fi
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
 
+{{ if eq .chezmoi.os "darwin" -}}
+# macOS preloads PATH via path_helper (from /etc/paths + /etc/paths.d/*);
+# clear it and re-run first so it establishes the system baseline *before*
+# our own entries below get prepended onto it. This has to come before the
+# `path=(...)` block, not after — path_helper doesn't know about anything
+# we've added, so running it later would silently wipe $HOME/.local/bin
+# (and everything else below) right back out.
+if [ -x /usr/libexec/path_helper ]; then
+    PATH=''
+    eval "$(/usr/libexec/path_helper -s)"
+fi
+
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{ end -}}
+
 # Directories zsh searches for programs, in priority order.
 path=(
   $HOME/bin(N)
@@ -35,20 +54,6 @@ fi
 if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
-
-{{ if eq .chezmoi.os "darwin" -}}
-# macOS preloads PATH via path_helper; clear it first so the above ordering sticks.
-if [ -x /usr/libexec/path_helper ]; then
-    PATH=''
-    eval "$(/usr/libexec/path_helper -s)"
-fi
-
-if [ -x /opt/homebrew/bin/brew ]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [ -x /usr/local/bin/brew ]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
-{{ end -}}
 
 if which go > /dev/null 2>&1; then
   PATH="$PATH:$(go env GOPATH)/bin"
