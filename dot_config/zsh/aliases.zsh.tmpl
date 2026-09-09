@@ -1,8 +1,13 @@
 # General aliases. Ported from the old dotmac zplug/aliases.zsh.
 
 alias gu="git up"                 # git alias: pull --rebase (autostash is global)
+alias gp="git push"
+alias gpf="git push --force"
+alias gco="git checkout"
+alias gb="git branch"
 alias gitrm="git ls-files -d | xargs git rm"
 alias gs='git status'
+alias gl="git log"
 
 # ls -> eza when available (mise installs it), else plain ls with colour.
 if (( $+commands[eza] )); then

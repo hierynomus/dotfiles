@@ -41,7 +41,7 @@
 	co = checkout
 	up = pull --rebase
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%Cblue%an, %Cgreen%cr)%Creset' --abbrev-commit --all
-	lg2 = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit
+	lg2 = log --color --graph --pretty=format:'%Cred%h%Creset --%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit
 	ribbon = tag --force _ribbon origin/main
 	catchup = log --patch --reverse --topo-order _ribbon..origin/main
 {{ if eq .chezmoi.os "darwin" -}}
