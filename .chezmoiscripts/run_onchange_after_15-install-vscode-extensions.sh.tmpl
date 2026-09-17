@@ -2,6 +2,13 @@
 # Installs the VS Code extensions the settings in this repo assume are
 # present (currently just the Catppuccin theme used by
 # workbench.colorTheme). Re-runs whenever this list changes.
+#
+# On a headless (gui=false) machine, everything below the `exit 0` a few
+# lines down is genuinely unreachable — that's the point, not a bug — but
+# CI's shellcheck job renders every gui/privileged combination, and from
+# a single rendered copy's point of view it's correct to flag the rest
+# of the file as unreachable code in that variant.
+# shellcheck disable=SC2317
 set -euo pipefail
 
 {{ if not .gui -}}
