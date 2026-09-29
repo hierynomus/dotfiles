@@ -50,9 +50,9 @@ $nix_shell\
 [](fg:mauve bg:pink)\
 $jobs\
 $status\
-[](fg:pink bg:sapphire)\
+[](fg:pink bg:lavender)\
 $time\
-[ ](fg:sapphire)\
+[ ](fg:lavender)\
 $cmd_duration\
 $line_break\
 $character"""
@@ -208,12 +208,12 @@ format = '[[ $symbol( $output) ](fg:crust bg:green)]($style)'
 
 [docker_context]
 symbol = ""
-style = "bg:sapphire"
-format = '[[ $symbol( $context) ](fg:crust bg:sapphire)]($style)'
+style = "bg:lavender"
+format = '[[ $symbol( $context) ](fg:crust bg:lavender)]($style)'
 
 [conda]
 symbol = "  "
-style = "fg:crust bg:sapphire"
+style = "fg:crust bg:lavender"
 format = '[$symbol$environment ]($style)'
 ignore_base = false
 
@@ -274,8 +274,8 @@ format = '[[ $symbol$status ](fg:crust bg:pink)]($style)'
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:sapphire"
-format = '[[  $time ](fg:crust bg:sapphire)]($style)'
+style = "bg:lavender"
+format = '[[  $time ](fg:crust bg:lavender)]($style)'
 
 [line_break]
 disabled = true
