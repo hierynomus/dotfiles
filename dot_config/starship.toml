@@ -274,8 +274,8 @@ format = '[[ $symbol$status ](fg:crust bg:pink)]($style)'
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:lavender"
-format = '[[  $time ](fg:crust bg:lavender)]($style)'
+style = "bg:sapphire"
+format = '[[  $time ](fg:crust bg:sapphire)]($style)'
 
 [line_break]
 disabled = true
