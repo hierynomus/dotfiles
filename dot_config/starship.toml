@@ -14,6 +14,15 @@
 # preset's red username segment is also swapped for a green/red (user/root)
 # hostname one, which moves the OS icon onto the otherwise unused blue.
 #
+# Unlike the preset, each optional group draws its own edges -- an inverted
+# arrow in front, an arrow on the terminal background behind -- inside a
+# `(...)` conditional group, so a group with nothing to show (no git repo,
+# no runtimes, no jobs...) vanishes instead of leaving an empty coloured
+# chevron. The preset's seamless colour-to-colour joins can't do that: a
+# separator needs both neighbours' colours, and starship can't know which
+# neighbour actually rendered. os/hostname/directory are always present, so
+# they keep the seamless joins.
+#
 # To pull a fresh copy of the preset (e.g. after a starship upgrade adds
 # something new) and re-diff by hand:
 #   starship preset catppuccin-powerline
@@ -25,10 +34,12 @@ $os\
 ${custom.host}\
 ${custom.host_root}\
 $directory\
-[](bg:yellow fg:peach)\
+[](fg:peach)\
+([](fg:yellow)\
 $git_branch\
 $git_status\
-[](fg:yellow bg:green)\
+[](fg:yellow))\
+([](fg:green)\
 $c\
 $rust\
 $golang\
@@ -40,21 +51,25 @@ $kotlin\
 $haskell\
 $python\
 ${custom.mise}\
-[](fg:green bg:mauve)\
+[](fg:green))\
+([](fg:mauve)\
 $kubernetes\
 $terraform\
 $aws\
 $azure\
 $gcloud\
 $nix_shell\
-[](fg:mauve bg:pink)\
+[](fg:mauve))\
+([](fg:pink)\
 $jobs\
 $status\
-[](fg:pink bg:sapphire)\
+[](fg:pink))\
+([](fg:sapphire)\
 $conda\
-[](fg:sapphire bg:lavender)\
+[](fg:sapphire))\
+[](fg:lavender)\
 $time\
-[ ](fg:lavender)\
+[ ](fg:lavender)\
 $cmd_duration\
 $line_break\
 $character"""
